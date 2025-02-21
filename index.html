@@ -120,6 +120,7 @@
   <div class="container">
     <div class="chat-container">
       <div class="chat-header">
+        <!-- Using your provided image URL -->
         <img src="https://media.istockphoto.com/id/1413766112/photo/successful-mature-businessman-looking-at-camera-with-confidence.jpg?s=612x612&w=0&k=20&c=NJSugBzNuZqb7DJ8ZgLfYKb3qPr2EJMvKZ21Sj5Sfq4=" alt="Albert Profile Picture">
         <h2>Albert</h2>
       </div>
@@ -153,15 +154,13 @@
       messagesEl.scrollTop = messagesEl.scrollHeight;
     }
 
-    // Typewriter effect: Reveal text one character at a time
-    function typeWriter(text, element, speed = 50) {
+    // Typewriter effect: reveal text one character at a time
+    function typeWriter(text, element, speed = 30) {
       let i = 0;
       const interval = setInterval(() => {
         element.textContent += text.charAt(i);
         i++;
-        if (i >= text.length) {
-          clearInterval(interval);
-        }
+        if (i >= text.length) clearInterval(interval);
       }, speed);
     }
 
@@ -172,7 +171,7 @@
       msgDiv.textContent = "Albert: ";
       messagesEl.appendChild(msgDiv);
       messagesEl.scrollTop = messagesEl.scrollHeight;
-      typeWriter(text, msgDiv, 30); // Faster typing: 30ms per character
+      typeWriter(text, msgDiv, 30);
     }
 
     sendBtn.addEventListener('click', async () => {
