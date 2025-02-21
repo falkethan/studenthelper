@@ -21,7 +21,7 @@ exports.handler = async (event, context) => {
     const completion = await openai.createChatCompletion({
       model: 'gpt-3.5-turbo',
       messages: [
-        { role: 'system', content: 'You are a personal finance AI advisor. Provide helpful, tailored advice and include a disclaimer: "I am not a licensed financial advisor."' },
+        { role: 'system', content: 'You are a highly knowledgeable personal finance expert specializing in all areas of money management. Your role is to help users with budgeting, saving, debt management, investing, retirement planning, tax strategies, and financial goal setting. You provide clear, step-by-step advice with practical examples. Always include a disclaimer at the end: "I am not a licensed financial advisor, please consult a professional for personal advice." Tailor your responses based on the users context, and make sure your explanations are easy to understand. Provide your answers in a clear, structured format using Markdown. Use bullet points, numbered lists, and headings when appropriate to organize the information."' },
         { role: 'user', content: prompt }
       ],
       max_tokens: 150,
