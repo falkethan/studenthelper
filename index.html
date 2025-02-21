@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <!-- Responsive meta tag -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Albert - Finance AI Chatbot</title>
+  <!-- Google Font: Roboto -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" 
+        rel="stylesheet" 
+        integrity="sha384-9ndCyUa3Y7rN2XvL0+8yA5jOc8wOj7B4cdzo5q35d8o8lUG5Fw6d1MRnQ+p4Bl6M" 
+        crossorigin="anonymous">
+  <style>
+    body {
+      background: #121212; /* Dark background */
+      color: #e0e0e0;
+      font-family: 'Roboto', sans-serif;
+      padding: 20px;
+    }
+    .chat-container {
+      max-width: 600px;
+      margin: auto;
+      background: #1e1e1e; /* Dark container */
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    }
+    .chat-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .chat-header img {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      margin-right: 15px;
+      object-fit: cover;
+    }
+    .chat-header h2 {
+      margin: 0;
+      color: #fff;
+    }
+    .messages {
+      height: 400px;
+      overflow-y: auto;
+      border: 1px solid #333;
+      padding: 10px;
+      margin-bottom: 15px;
+      border-radius: 5px;
+      background: #2c2c2c;
+    }
+    .message {
+      margin-bottom: 10px;
+      font-size: 16px;
+      padding: 8px;
+      border-radius: 5px;
+    }
+    .message.user {
+      background: rgba(255, 255, 255, 0.1);
+      color: #ffffff; /* White text for user */
+    }
+    .message.bot {
+      background: rgba(173, 216, 230, 0.1);
+      color: #add8e6; /* Light blue text for Albert */
+    }
+    textarea.form-control {
+      background: #333;
+      color: #e0e0e0;
+      border: 1px solid #444;
+      border-radius: 5px;
+    }
+    /* Input group layout */
+    .input-group {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .input-group textarea {
+      width: 80%;
+      margin-right: 10px;
+    }
+    /* Smaller circular send button with centered white arrow */
+    button#send {
+      background: #007bff;
+      border: none;
+      border-radius: 50%;
+      font-weight: 500;
+      transition: background 0.3s ease;
+      width: 40px;
+      height: 40px;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+    }
+    button#send:hover {
+      background: #0056b3;
+    }
+    /* Media queries for mobile */
+    @media (max-width: 576px) {
+      .chat-container {
+        padding: 15px;
+      }
+      .input-group textarea {
+        width: 70%;
+      }
+      button#send {
+        width: 35px;
+        height: 35px;
+        font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="chat-container">
+      <div class="chat-header">
+        <img src="https://media.istockphoto.com/id/1413766112/photo/successful-mature-businessman-looking-at-camera-with-confidence.jpg?s=612x612&w=0&k=20&c=NJSugBzNuZqb7DJ8ZgLfYKb3qPr2EJMvKZ21Sj5Sfq4=" alt="Albert Profile Picture">
+        <h2>Albert</h2>
+      </div>
+      <div class="messages mb-3" id="messages"></div>
+      <!-- Loading Spinner (hidden by default) -->
+      <div id="spinner" class="text-center my-2" style="display: none;">
+        <div class="spinner-border" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+      <!-- Input group: Centered text area with send arrow to the right -->
+      <div class="input-group mb-3">
+        <textarea id="prompt" class="form-control" placeholder="I'm Albert - The Financial AI in your pocket" rows="1" style="resize: none;"></textarea>
+        <button id="send" class="btn">&#8594;</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const messagesEl = document.getElementById('messages');
+    const promptEl = document.getElementById('prompt');
+    const sendBtn = document.getElementById('send');
+    const spinnerEl = document.getElementById('spinner');
+
+    // Function to add a message immediately (for user messages)
+    function addMessage(text, sender) {
+      const msgDiv = document.createElement('div');
+      msgDiv.className = 'message ' + sender + ' mb-2';
+      msgDiv.textContent = text;
+      messagesEl.appendChild(msgDiv);
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
+
+    // Typewriter effect: Reveal text one character at a time
+    function typeWriter(text, element, speed = 50) {
+      let i = 0;
+      const interval = setInterval(() => {
+        element.textContent += text.charAt(i);
+        i++;
+        if (i >= text.length) {
+          clearInterval(interval);
+        }
+      }, speed);
+    }
+
+    // Add bot message with typewriter effect
+    function addBotMessageWithTyping(text) {
+      const msgDiv = document.createElement('div');
+      msgDiv.className = 'message bot mb-2';
+      msgDiv.textContent = "Albert: ";
+      messagesEl.appendChild(msgDiv);
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+      typeWriter(text, msgDiv, 30); // Faster typing: 30ms per character
+    }
+
+    sendBtn.addEventListener('click', async () => {
+      const promptText = promptEl.value.trim();
+      if (!promptText) return;
+      
+      // Display user's message immediately
+      addMessage("You: " + promptText, 'user');
+      promptEl.value = '';
+      
+      // Show the spinner while waiting for a response
+      spinnerEl.style.display = 'block';
+
+      try {
+        const response = await fetch('http://192.168.1.238:3001/api/ask', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt: promptText }),
+        });
+        const data = await response.json();
+        if (data.response) {
+          addBotMessageWithTyping(data.response);
+        } else {
+          addMessage("Albert: (No response)", 'bot');
+        }
+      } catch (err) {
+        console.error(err);
+        addMessage("Albert: Error connecting to server.", 'bot');
+      } finally {
+        spinnerEl.style.display = 'none';
+      }
+    });
+
+    // Submit on pressing Enter (without newline)
+    promptEl.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendBtn.click();
+      }
+    });
+  </script>
+  <!-- Bootstrap Bundle JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" 
+          integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+3oV+I1p5Iw+fRvH+8abtTE1Pi6jizo" 
+          crossorigin="anonymous"></script>
+</body>
+</html>
