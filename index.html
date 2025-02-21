@@ -187,7 +187,7 @@
       spinnerEl.style.display = 'block';
 
       try {
-        const response = await fetch('http://192.168.1.238:3001/api/ask', {
+        const response = await fetch('https://financeaibot.netlify.app/.netlify/functions/ask', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ prompt: promptText }),
