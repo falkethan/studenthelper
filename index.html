@@ -323,6 +323,7 @@
       spinnerEl.style.display = 'block';
 
       try {
+        //Sends message to API
         const response = await fetch(API_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
