@@ -152,6 +152,11 @@
     }
 
     function markdownToHTML(markdown) {
+      // Helper function to convert markdown links to HTML links
+      function parseLinks(text) {
+        return text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
+      }
+    
       // Recursively process list lines based on indentation
       function parseNestedLists(lines, startIndex, currentIndent) {
         let html = "";
@@ -173,8 +178,11 @@
           
           const indent = listMatch[1].length;
           const marker = listMatch[2];
-          const content = listMatch[3];
+          let content = listMatch[3];
           const currentType = /^\d+\./.test(marker) ? 'ol' : 'ul';
+    
+          // Process markdown links in the content.
+          content = parseLinks(content);
     
           // Open a new list tag if needed.
           if (!listType) {
