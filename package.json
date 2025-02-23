@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "netlify dev"
   },
   "keywords": [],
   "author": "",
@@ -14,5 +14,8 @@
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "openai": "^3.3.0"
+  },
+  "devDependencies": {
+    "netlify-cli": "^18.1.0"
   }
 }
