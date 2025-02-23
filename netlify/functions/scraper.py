@@ -7,6 +7,23 @@ URLS = [
     "https://www.investopedia.com",
     "https://www.nerdwallet.com/article/investing",
     "https://www.cnbc.com/personal-finance/"
+    "https://finance.yahoo.com/personal-finance/credit-cards/"
+    "https://finance.yahoo.com/personal-finance/mortgages/"
+    "https://finance.yahoo.com/personal-finance/banking/"
+    "https://finance.yahoo.com/personal-finance/student-loans/"
+    "https://finance.yahoo.com/personal-finance/personal-loans/"
+    "https://finance.yahoo.com/personal-finance/taxes/"
+    "https://www.bankrate.com/investing/best-short-term-investments/"
+    "https://www.bankrate.com/investing/how-to-buy-stocks/"
+    "https://www.bankrate.com/investing/traditional-ira-vs-roth-ira/"
+    "https://www.irs.gov/"
+    "https://www.usa.gov/help-with-taxes"
+    "https://www.wsj.com/"
+    "https://www.nytimes.com/topic/subject/finances"
+    "https://www.investing.com/"
+    "https://www.forbes.com/personal-finance/"
+    "https://www.marketwatch.com/"
+    "https://www.bloomberg.com/"
 ]
 
 HEADERS = {"User-Agent": "Mozilla/5.0"}
