@@ -103,6 +103,23 @@
     #preset-prompts button {
       margin: 0 5px;
     }
+    /* Styles for the animated progress bar */
+    #progressContainer {
+      width: 100%;
+      height: 4px;
+      background: transparent;
+      border: 1px solid white;
+      border-radius: 2px;
+      overflow: hidden;
+      margin-bottom: 10px;
+      display: none;
+    }
+    #progressBar {
+      width: 0%;
+      height: 100%;
+      background-color: #ffffff;
+      transition: width 0.2s ease-in-out;
+    }
     @media (max-width: 576px) {
       .chat-container {
         padding: 15px;
@@ -127,11 +144,9 @@
       </div>
       <div class="messages mb-3" id="messages"></div>
       
-      <!-- Spinner -->
-      <div id="spinner" class="text-center my-2" style="display: none;">
-        <div class="spinner-border" role="status">
-          <span class="visually-hidden">Loading...</span>
-        </div>
+      <!-- Animated Progress Bar -->
+      <div id="progressContainer">
+        <div id="progressBar"></div>
       </div>
       
       <!-- Preset Prompt Buttons -->
@@ -153,7 +168,7 @@
     const messagesEl = document.getElementById('messages');
     const promptEl = document.getElementById('prompt');
     const sendBtn = document.getElementById('send');
-    const spinnerEl = document.getElementById('spinner');
+    // Removed spinner; using progress bar instead
 
     // Automatically detect correct API URL
     const API_URL =
@@ -170,17 +185,13 @@
     }
 
     function markdownToHTML(markdown) {
-      // Helper function to convert markdown links to HTML links
       function parseLinks(text) {
         return text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
       }
-    
-      // Recursively process list lines based on indentation
       function parseNestedLists(lines, startIndex, currentIndent) {
         let html = "";
-        let listType = null; // 'ul' or 'ol'
+        let listType = null;
         let i = startIndex;
-    
         while (i < lines.length) {
           const line = lines[i];
           if (line.trim() === "") {
@@ -233,11 +244,9 @@
         }
         return { html, index: i };
       }
-    
       const lines = markdown.split('\n');
       let output = "";
       let i = 0;
-    
       while (i < lines.length) {
         const line = lines[i];
         if (/^\s*([-*]|\d+\.)\s+/.test(line)) {
@@ -250,7 +259,6 @@
           i++;
         }
       }
-    
       output = output.replace(/^###### (.*)$/gm, '<h6>$1</h6>');
       output = output.replace(/^##### (.*)$/gm, '<h5>$1</h5>');
       output = output.replace(/^#### (.*)$/gm, '<h4>$1</h4>');
@@ -259,7 +267,6 @@
       output = output.replace(/^# (.*)$/gm, '<h1>$1</h1>');
       output = output.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
       output = output.replace(/\*(.+?)\*/g, '<em>$1</em>');
-    
       return output;
     }
 
@@ -301,6 +308,33 @@
       }, 200);
     }
 
+    // Progress bar functions
+    let progressInterval;
+    function startProgress() {
+      const progressContainer = document.getElementById('progressContainer');
+      const progressBar = document.getElementById('progressBar');
+      progressBar.style.width = '0%';
+      progressContainer.style.display = 'block';
+      let progress = 0;
+      progressInterval = setInterval(() => {
+        if (progress < 90) {
+          progress += 5;
+          progressBar.style.width = progress + '%';
+        } else {
+          clearInterval(progressInterval);
+        }
+      }, 200);
+    }
+
+    function finishProgress() {
+      const progressBar = document.getElementById('progressBar');
+      progressBar.style.width = '100%';
+      clearInterval(progressInterval);
+      setTimeout(() => {
+        document.getElementById('progressContainer').style.display = 'none';
+      }, 500);
+    }
+
     sendBtn.addEventListener('click', async () => {
       const promptText = promptEl.value.trim();
       if (!promptText) return;
@@ -308,7 +342,9 @@
       conversation.push({ role: 'user', content: promptText });
       addMessage("You: " + promptText, 'user');
       promptEl.value = '';
-      spinnerEl.style.display = 'block';
+      
+      // Start progress bar
+      startProgress();
   
       try {
         const response = await fetch(API_URL, {
@@ -327,7 +363,8 @@
         console.error(err);
         addMessage("Bloo: Error connecting to server.", 'bot');
       } finally {
-        spinnerEl.style.display = 'none';
+        // Finish progress bar
+        finishProgress();
       }
     });
 
@@ -338,7 +375,6 @@
       }
     });
 
-    // Add event listeners for preset prompt buttons
     document.querySelectorAll('.preset-btn').forEach(button => {
       button.addEventListener('click', () => {
         promptEl.value = button.getAttribute('data-prompt');
