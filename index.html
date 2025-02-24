@@ -95,6 +95,14 @@
     button#send:hover {
       background: #0056b3;
     }
+    /* Styles for the preset prompt buttons */
+    #preset-prompts {
+      margin-bottom: 15px;
+      text-align: center;
+    }
+    #preset-prompts button {
+      margin: 0 5px;
+    }
     @media (max-width: 576px) {
       .chat-container {
         padding: 15px;
@@ -118,11 +126,21 @@
         <h2>Bloo</h2>
       </div>
       <div class="messages mb-3" id="messages"></div>
+      
+      <!-- Spinner -->
       <div id="spinner" class="text-center my-2" style="display: none;">
         <div class="spinner-border" role="status">
           <span class="visually-hidden">Loading...</span>
         </div>
       </div>
+      
+      <!-- Preset Prompt Buttons -->
+      <div id="preset-prompts" class="mb-3">
+        <button class="btn btn-secondary preset-btn" data-prompt="I need help with my homework">Help with homework</button>
+        <button class="btn btn-secondary preset-btn" data-prompt="I want you to summarize this reading for my class">Summarize reading</button>
+        <button class="btn btn-secondary preset-btn" data-prompt="What can you help me with?">More</button>
+      </div>
+
       <div class="input-group mb-3">
         <textarea id="prompt" class="form-control" placeholder="Hey, I'm Bloo. What class can I help you with?" rows="1" style="resize: none;"></textarea>
         <button id="send" class="btn">&#8594;</button>
@@ -165,42 +183,30 @@
     
         while (i < lines.length) {
           const line = lines[i];
-          // If the line is blank, preserve it and continue without breaking the list.
           if (line.trim() === "") {
             html += "\n";
             i++;
             continue;
           }
-          
           const listMatch = line.match(/^(\s*)([-*]|\d+\.)\s+(.*)$/);
-          // If the line isn't a list item or its indentation is less than the current level, break.
           if (!listMatch || listMatch[1].length < currentIndent) break;
-          
           const indent = listMatch[1].length;
           const marker = listMatch[2];
           let content = listMatch[3];
           const currentType = /^\d+\./.test(marker) ? 'ol' : 'ul';
-    
-          // Process markdown links in the content.
           content = parseLinks(content);
-    
-          // Open a new list tag if needed.
           if (!listType) {
             listType = currentType;
             html += `<${listType}>\n`;
           } else if (listType !== currentType) {
-            // If the type changes at the same level, close the old list and open a new one.
             html += `</${listType}>\n`;
             listType = currentType;
             html += `<${listType}>\n`;
           }
-    
-          // Check for nested list items in subsequent lines.
           let nestedHtml = "";
           let j = i + 1;
           while (j < lines.length) {
             const nextLine = lines[j];
-            // If the next line is blank, include it and move on.
             if (nextLine.trim() === "") {
               nestedHtml += "\n";
               j++;
@@ -208,7 +214,6 @@
             }
             const nextMatch = nextLine.match(/^(\s*)([-*]|\d+\.)\s+(.*)$/);
             if (nextMatch && nextMatch[1].length > indent) {
-              // Process nested list recursively.
               const nestedResult = parseNestedLists(lines, j, nextMatch[1].length);
               nestedHtml += nestedResult.html;
               j = nestedResult.index;
@@ -216,7 +221,6 @@
               break;
             }
           }
-    
           html += `<li>${content}`;
           if (nestedHtml) {
             html += "\n" + nestedHtml;
@@ -224,21 +228,18 @@
           html += `</li>\n`;
           i = j;
         }
-    
         if (listType) {
           html += `</${listType}>\n`;
         }
         return { html, index: i };
       }
     
-      // Split the markdown into lines and process each one.
       const lines = markdown.split('\n');
       let output = "";
       let i = 0;
     
       while (i < lines.length) {
         const line = lines[i];
-        // If the line starts with a list marker, process the list.
         if (/^\s*([-*]|\d+\.)\s+/.test(line)) {
           const indent = (line.match(/^(\s*)/)[1] || "").length;
           const result = parseNestedLists(lines, i, indent);
@@ -250,34 +251,22 @@
         }
       }
     
-      // Process other markdown features
-    
-      // Headings (from h6 to h1)
       output = output.replace(/^###### (.*)$/gm, '<h6>$1</h6>');
       output = output.replace(/^##### (.*)$/gm, '<h5>$1</h5>');
       output = output.replace(/^#### (.*)$/gm, '<h4>$1</h4>');
       output = output.replace(/^### (.*)$/gm, '<h3>$1</h3>');
       output = output.replace(/^## (.*)$/gm, '<h2>$1</h2>');
       output = output.replace(/^# (.*)$/gm, '<h1>$1</h1>');
-    
-      // Bold text: **text**
       output = output.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-    
-      // Italic text: *text*
       output = output.replace(/\*(.+?)\*/g, '<em>$1</em>');
     
       return output;
     }
 
     function intoPieces(text) {
-      // If the text is empty or all whitespace, return it as a single element.
       if (/^\s*$/.test(text)) {
         return [text];
       }
-      // This regex matches an optional block of leading whitespace,
-      // then one or more non-whitespace characters, and finally any trailing whitespace.
-      // As a result, for a typical string like "Hello   world", the first match is "Hello   "
-      // and the second match is "world".
       const pieces = text.match(/(\s*\S+\s*)/g);
       return pieces || [];
     }
@@ -292,30 +281,19 @@
     }
 
     function addBotMessageWithFormattingAndTyping(text, wpm) {
-      // first create the div we'll put the message in
       const msgDiv = document.createElement('div');
       msgDiv.className = 'message bot mb-2';
       messagesEl.appendChild(msgDiv);
       messagesEl.scrollTop = messagesEl.scrollHeight;
-      // now break up the text into pieces to simulate a streaming response from the AI
       const pieces = intoPieces(text);
-      // how many words per millisecond should this bot type?
       const wordsPerMillisecond = wpm / 60000;
-      // remember when we started so we know how many words should have been typed
       const now = Date.now();
-      // every 200ms check where we are and update the message
       const interval = setInterval(() => {
-        // this runs every 200ms
-        // we will calculate based on when we started how many words we should have typed
         const elapsedMilliseconds = Date.now() - now;
         const expectedWordCount = Math.min(elapsedMilliseconds * wordsPerMillisecond, pieces.length);
-        // put that many words into one string
         const segment = pieces.slice(0, expectedWordCount + 1).join('');
-        // convert that to HTML using simple markdown processor
         const html = markdownToHTML(segment);
-        // add "Alber: " and put it in the div
         msgDiv.innerHTML = `<strong>Bloo: </strong> ${html}`;
-        // if we've reached the end, stop repeating this code
         if (expectedWordCount >= pieces.length) {
           clearInterval(interval);
           return;
@@ -327,14 +305,12 @@
       const promptText = promptEl.value.trim();
       if (!promptText) return;
   
-      // Add the user's message to the conversation array
       conversation.push({ role: 'user', content: promptText });
       addMessage("You: " + promptText, 'user');
       promptEl.value = '';
       spinnerEl.style.display = 'block';
   
       try {
-        // Send the entire conversation array to the backend
         const response = await fetch(API_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -342,7 +318,6 @@
         });
         const data = await response.json();
         if (data.response) {
-          // Add the bot's response to the conversation array
           conversation.push({ role: 'assistant', content: data.response });
           addBotMessageWithFormattingAndTyping(data.response, 1000);
         } else {
@@ -361,6 +336,14 @@
         e.preventDefault();
         sendBtn.click();
       }
+    });
+
+    // Add event listeners for preset prompt buttons
+    document.querySelectorAll('.preset-btn').forEach(button => {
+      button.addEventListener('click', () => {
+        promptEl.value = button.getAttribute('data-prompt');
+        sendBtn.click();
+      });
     });
   </script>
 </body>
