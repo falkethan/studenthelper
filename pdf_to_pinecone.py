@@ -16,7 +16,7 @@ PINECONE_NAMESPACE = os.getenv("PINECONE_NAMESPACE", "default")
 # Initialize the OpenAI client using the new method
 client = OpenAI(api_key=OPENAI_API_KEY)
 
-# Initialize Pinecone using the new method
+# Initialize Pinecone using the new method. Adding this comment to have something to push.
 pc = Pinecone(api_key=PINECONE_API_KEY)
 index = pc.Index(PINECONE_INDEX_NAME)
 
