@@ -1,6 +1,7 @@
-const fs = require("fs");
+const fs = require("fs"); 
 const path = require("path");
 const { Configuration, OpenAIApi } = require("openai");
+const { initPinecone, queryCoursework } = require('./pinecone');
 
 // Load scraped finance data
 const financeDataPath = path.join(__dirname, "scraped_finance_data.json");
@@ -47,6 +48,28 @@ exports.handler = async (event, context) => {
     });
     const openai = new OpenAIApi(configuration);
 
+    // --- Begin Pinecone Integration ---
+
+    // Get the user's latest query from the conversation
+    const userQuery = conversation[conversation.length - 1].content;
+
+    // Convert the user's query to an embedding using OpenAI's embedding API
+    const embeddingResponse = await openai.createEmbedding({
+      model: 'text-embedding-ada-002',
+      input: userQuery,
+    });
+    const queryEmbedding = embeddingResponse.data.data[0].embedding;
+
+    // Query Pinecone to retrieve relevant coursework (top 5 matches)
+    const pineconeMatches = await queryCoursework(queryEmbedding, 5);
+
+    // Construct a string with the relevant coursework data
+    const courseworkContext = pineconeMatches.length
+      ? `\n\nRelevant coursework found:\n${pineconeMatches.map(match => `- ${match.metadata.text}`).join("\n")}`
+      : "";
+
+    // --- End Pinecone Integration ---
+
     const messages = [
       {
         role: "system",
@@ -58,6 +81,7 @@ exports.handler = async (event, context) => {
           If article links or references are available, you must include them in your response. 
           Additionally, before offering any advice or information, ask follow-up questions to clarify the user's specific situation, avoiding generic or potentially irrelevant options. 
           Remember: your responses must be delivered exclusively in Markdown format for all user interactions.
+          ${courseworkContext}
           `
       },
       ...conversation
