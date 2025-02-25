@@ -148,7 +148,13 @@
       <div id="progressContainer">
         <div id="progressBar"></div>
       </div>
-      
+
+    <!-- Add this section above your chatbot input -->
+<div id="file-upload-container">
+  <input type="file" id="fileUpload" accept=".pdf,.pptx,.docx">
+  <button id="uploadBtn">Upload File</button>
+</div>
+  
       <!-- Preset Prompt Buttons -->
       <div id="preset-prompts" class="mb-3">
         <button class="btn btn-secondary preset-btn" data-prompt="I need help with my homework">Help with homework</button>
@@ -382,5 +388,33 @@
       });
     });
   </script>
+
+<script>
+  document.getElementById("uploadBtn").addEventListener("click", async () => {
+    const fileInput = document.getElementById("fileUpload");
+    const file = fileInput.files[0];
+    if (!file) {
+      alert("Please select a file to upload.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const response = await fetch("/.netlify/functions/upload", {
+        method: "POST",
+        body: formData,
+      });
+      const result = await response.json();
+      console.log("Upload result:", result);
+      alert(result.message || "File processed successfully.");
+    } catch (error) {
+      console.error("Error uploading file:", error);
+      alert("File upload failed.");
+    }
+  });
+</script>
+
 </body>
 </html>

@@ -22,26 +22,6 @@ exports.handler = async (event, context) => {
     // Parse the request body
     const { conversation } = JSON.parse(event.body);
 
-    // Find relevant scraped finance data (simple search)
-    //let relevantArticles = financeData
-    //  .filter(article => article.title.toLowerCase().includes(prompt.toLowerCase()))
-    //  .slice(0, 3); // Return top 3 relevant articles
-
-    //let extraInfo = relevantArticles.length
-    //  ? `Here are some articles you might find useful:\n${relevantArticles
-    //      .map(article => `- [${article.title}](${article.url})`)
-    //      .join("\n")}`
-    //  : "";
-
-    // ✅ Debug Log: Show scraped data that matches the user's prompt
-    //console.log("🔍 Scraped finance data found:", relevantArticles);
-
-    // Construct the final prompt being sent to OpenAI
-    //const finalPrompt = `${prompt}\n\n${extraInfo}`;
-
-    // ✅ Debug Log: Show final prompt sent to OpenAI
-    //console.log("📨 Final prompt being sent to OpenAI:", finalPrompt);
-
     // Initialize OpenAI
     const configuration = new Configuration({
       apiKey: process.env.OPENAI_API_KEY, // Set this in Netlify's Environment Variables
@@ -62,7 +42,8 @@ exports.handler = async (event, context) => {
 
     // Query Pinecone to retrieve relevant coursework (top 5 matches)
     const pineconeMatches = await queryCoursework(queryEmbedding, 5);
-
+    console.log("🔍 Pinecone Query Results:", pineconeMatches);
+    
     // Construct a string with the relevant coursework data
     const courseworkContext = pineconeMatches.length
       ? `\n\nRelevant coursework found:\n${pineconeMatches.map(match => `- ${match.metadata.text}`).join("\n")}`
@@ -70,6 +51,7 @@ exports.handler = async (event, context) => {
 
     // --- End Pinecone Integration ---
 
+    // Now initialize messages after courseworkContext is defined
     const messages = [
       {
         role: "system",
@@ -87,6 +69,8 @@ exports.handler = async (event, context) => {
       ...conversation
     ];
 
+    // Debug log after messages is defined
+    console.log("System prompt:", messages[0].content);
     console.log("Conversation messages:", messages);
 
     // Call OpenAI's Chat Completion API
