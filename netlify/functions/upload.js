@@ -24,7 +24,7 @@ exports.handler = async (event, context) => {
         console.log("File saved to", tempFilePath);
 
         // Call the Python ingestion script using child_process.exec.
-        const command = `python ingest_file.py "${tempFilePath}"`;
+        const command = `python ./ingest_file.py "${tempFilePath}"`;
         exec(command, (error, stdout, stderr) => {
           if (error) {
             console.error("Error processing file:", error);

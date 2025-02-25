@@ -7,12 +7,17 @@ from dotenv import load_dotenv
 
 # File-specific libraries
 from PyPDF2 import PdfReader
-# You may need to install these:
-# pip install python-pptx python-docx
 from pptx import Presentation
 from docx import Document
 
+# Load environment variables from .env file
 load_dotenv()
+
+# Log environment variables for debugging (avoid printing sensitive keys in production)
+print("OPENAI_API_KEY:", os.getenv("OPENAI_API_KEY"))
+print("PINECONE_API_KEY:", os.getenv("PINECONE_API_KEY"))
+print("PINECONE_INDEX_NAME:", os.getenv("PINECONE_INDEX_NAME"))
+print("PINECONE_NAMESPACE:", os.getenv("PINECONE_NAMESPACE", "default"))
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
@@ -24,6 +29,7 @@ pc = Pinecone(api_key=PINECONE_API_KEY)
 index = pc.Index(PINECONE_INDEX_NAME)
 
 def extract_text_from_pdf(file_path):
+    print(f"Extracting text from PDF: {file_path}")
     reader = PdfReader(file_path)
     text = ""
     for page in reader.pages:
@@ -33,6 +39,7 @@ def extract_text_from_pdf(file_path):
     return text
 
 def extract_text_from_pptx(file_path):
+    print(f"Extracting text from PPTX: {file_path}")
     prs = Presentation(file_path)
     text = ""
     for slide in prs.slides:
@@ -42,18 +49,21 @@ def extract_text_from_pptx(file_path):
     return text
 
 def extract_text_from_docx(file_path):
+    print(f"Extracting text from DOCX: {file_path}")
     doc = Document(file_path)
     text = "\n".join([para.text for para in doc.paragraphs])
     return text
 
 def chunk_text(full_text):
-    # A simple split on double newlines; refine as needed
-    return [chunk.strip() for chunk in full_text.split("\n\n") if chunk.strip()]
+    chunks = [chunk.strip() for chunk in full_text.split("\n\n") if chunk.strip()]
+    print(f"Chunked text into {len(chunks)} chunks")
+    return chunks
 
 def generate_vectors(chunks):
     vectors = []
     for i, chunk in enumerate(chunks):
         try:
+            print(f"Generating embedding for chunk {i} (length: {len(chunk)})")
             response = client.embeddings.create(
                 model="text-embedding-ada-002",
                 input=chunk
@@ -66,6 +76,7 @@ def generate_vectors(chunks):
             })
         except Exception as e:
             print(f"Error processing chunk {i}: {e}")
+    print(f"Generated {len(vectors)} vectors")
     return vectors
 
 def upsert_vectors(vectors):
@@ -81,6 +92,7 @@ if __name__ == "__main__":
         sys.exit(1)
 
     file_path = sys.argv[1]
+    print("Ingesting file:", file_path)
     ext = os.path.splitext(file_path)[1].lower()
 
     if ext == ".pdf":
@@ -92,6 +104,7 @@ if __name__ == "__main__":
     else:
         raise ValueError("Unsupported file type: " + ext)
 
+    print("Extracted text length:", len(full_text))
     chunks = chunk_text(full_text)
     vectors = generate_vectors(chunks)
     upsert_vectors(vectors)
