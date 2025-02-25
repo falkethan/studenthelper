@@ -1,29 +1,13 @@
 // pinecone.js
-const { Pinecone } = require('@pinecone-database/pinecone');
+import { initPinecone } from "./initpinecone.js";
 
-// Initialize the Pinecone client and target your index
-async function initPinecone() {
-  // Create a new Pinecone client instance using your API key
-  const pc = new Pinecone({
-    apiKey: process.env.PINECONE_API_KEY,
-  });
-  // Target your index using the index name from your environment variables
-  const index = pc.index(process.env.PINECONE_INDEX_NAME);
-  return index;
-}
-
-// Query the Pinecone index for relevant vectors based on the provided embedding
-async function queryCoursework(queryEmbedding, topK = 5) {
+export async function queryCoursework(queryEmbedding, topK = 5) {
   const index = await initPinecone();
-  // Use a namespace if you have one defined; otherwise, use 'default'
-  const namespace = process.env.PINECONE_NAMESPACE || 'default';
-  const response = await index.namespace(namespace).query({
-    topK: topK,
+  const response = await index.query({
     vector: queryEmbedding,
-    includeValues: false,       // Change to true if you need the raw vector values
-    includeMetadata: true,      // We need metadata to extract course-specific text
+    topK: topK,
+    includeMetadata: true,
+    includeValues: false,
   });
   return response.matches;
 }
-
-module.exports = { initPinecone, queryCoursework };

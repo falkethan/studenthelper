@@ -1,29 +1,29 @@
 // netlify/functions/upload.js
-const Busboy = require('busboy'); // Import directly without destructuring
-const fs = require('fs');
-const path = require('path');
-const { exec } = require('child_process');
+import Busboy from "busboy";
+import fs from "fs";
+import path from "path";
+import { exec } from "child_process";
 
-exports.handler = async (event, context) => {
+export async function handler(event, context) {
   return new Promise((resolve, reject) => {
     const busboy = new Busboy({ headers: event.headers });
     let fileBuffer = Buffer.alloc(0);
-    let fileName = '';
+    let fileName = "";
 
-    busboy.on('file', (fieldname, file, filename, encoding, mimetype) => {
+    busboy.on("file", (fieldname, file, filename, encoding, mimetype) => {
       fileName = filename;
-      file.on('data', (data) => {
+      file.on("data", (data) => {
         fileBuffer = Buffer.concat([fileBuffer, data]);
       });
     });
 
-    busboy.on('finish', async () => {
+    busboy.on("finish", async () => {
       try {
-        const tempFilePath = path.join('/tmp', fileName);
+        const tempFilePath = path.join("/tmp", fileName);
         fs.writeFileSync(tempFilePath, fileBuffer);
         console.log("File saved to", tempFilePath);
 
-        // Call the Python ingestion script using child_process.exec.
+        // Example: calling a Python script (if available)
         const command = `python ./ingest_file.py "${tempFilePath}"`;
         exec(command, (error, stdout, stderr) => {
           if (error) {
@@ -50,6 +50,6 @@ exports.handler = async (event, context) => {
     });
 
     // Busboy requires the body to be a Buffer when using Netlify functions.
-    busboy.end(Buffer.from(event.body, 'base64'));
+    busboy.end(Buffer.from(event.body, "base64"));
   });
-};
+}

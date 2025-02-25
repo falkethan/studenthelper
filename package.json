@@ -1,6 +1,7 @@
 {
   "name": "finance-bot",
   "version": "1.0.0",
+  "type": "module",
   "main": "index.js",
   "scripts": {
     "dev": "netlify dev"
@@ -15,7 +16,11 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
-    "openai": "^3.3.0"
+    "mammoth": "^1.9.0",
+    "officeparser": "^5.1.1",
+    "openai": "^3.3.0",
+    "pdf-parse": "^1.1.1",
+    "pptx2json": "^0.0.10"
   },
   "devDependencies": {
     "netlify-cli": "^18.1.0"
