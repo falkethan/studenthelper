@@ -1,44 +1,34 @@
 // netlify/functions/upload.js
-import Busboy from "busboy";
-import fs from "fs";
-import path from "path";
-import { exec } from "child_process";
+import Busboy from 'busboy';
+import fs from 'fs';
+import path from 'path';
+import { ingestFile } from './ingest_file_node.js'; // Ensure ingest_file_node.js exports a function named ingestFile
 
 export async function handler(event, context) {
   return new Promise((resolve, reject) => {
     const busboy = new Busboy({ headers: event.headers });
     let fileBuffer = Buffer.alloc(0);
-    let fileName = "";
+    let fileName = '';
 
-    busboy.on("file", (fieldname, file, filename, encoding, mimetype) => {
+    busboy.on('file', (fieldname, file, filename, encoding, mimetype) => {
       fileName = filename;
-      file.on("data", (data) => {
+      file.on('data', (data) => {
         fileBuffer = Buffer.concat([fileBuffer, data]);
       });
     });
 
-    busboy.on("finish", async () => {
+    busboy.on('finish', async () => {
       try {
-        const tempFilePath = path.join("/tmp", fileName);
+        const tempFilePath = path.join('/tmp', fileName);
         fs.writeFileSync(tempFilePath, fileBuffer);
         console.log("File saved to", tempFilePath);
 
-        // Example: calling a Python script (if available)
-        const command = `python ./ingest_file.py "${tempFilePath}"`;
-        exec(command, (error, stdout, stderr) => {
-          if (error) {
-            console.error("Error processing file:", error);
-            reject({
-              statusCode: 500,
-              body: JSON.stringify({ error: error.message }),
-            });
-          } else {
-            console.log("Ingestion output:", stdout);
-            resolve({
-              statusCode: 200,
-              body: JSON.stringify({ message: "File processed and ingested successfully." }),
-            });
-          }
+        // Instead of calling a Python script, call the Node.js ingestion function directly:
+        await ingestFile(tempFilePath);
+        
+        resolve({
+          statusCode: 200,
+          body: JSON.stringify({ message: "File processed and ingested successfully." }),
         });
       } catch (error) {
         console.error("Error processing file:", error);
@@ -50,6 +40,6 @@ export async function handler(event, context) {
     });
 
     // Busboy requires the body to be a Buffer when using Netlify functions.
-    busboy.end(Buffer.from(event.body, "base64"));
+    busboy.end(Buffer.from(event.body, 'base64'));
   });
 }
