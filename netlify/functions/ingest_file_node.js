@@ -3,7 +3,7 @@ import fs from "fs";
 import path from "path";
 import pdfParse from "pdf-parse";
 import mammoth from "mammoth";
-import PPTX2Json from "pptx2json"; // Note: now imported as a class
+import PPTX2Json from "pptx2json"; // imported as a class
 import officeParser from "officeparser"; // fallback for PPTX extraction
 import { Configuration, OpenAIApi } from "openai";
 import { Pinecone } from "@pinecone-database/pinecone";
@@ -67,7 +67,6 @@ async function extractTextFromPPTX(filePath) {
   } catch (err) {
     console.error("Error using pptx2json:", err);
   }
-
   // If no text was extracted, try falling back to officeParser
   if (text.trim().length === 0) {
     console.warn("pptx2json returned empty text. Falling back to officeParser.");
@@ -75,7 +74,6 @@ async function extractTextFromPPTX(filePath) {
       const officeResult = await new Promise((resolve, reject) => {
         officeParser.parseOffice(filePath, (err, data) => {
           if (err) {
-            // If error is a short string, assume it's valid extracted text
             if (typeof err === "string" && err.trim().length < 300) {
               return resolve({ text: err });
             }
@@ -166,14 +164,14 @@ async function ingestFile(filePath) {
   }
   
   const chunks = chunkText(fullText);
-  // Create a unique prefix using the file name and current timestamp
   const uniquePrefix = `${path.basename(filePath, path.extname(filePath))}-${Date.now()}`;
   const vectors = await generateVectors(chunks, uniquePrefix);
   await upsertVectors(vectors, namespace);
 }
 
-// Execute ingestion if a file path is provided as a command-line argument
-if (process.argv.length > 2) {
+// Only run CLI ingestion if NOT running as a Netlify function.
+// Netlify sets process.env.FUNCTION_NAME, so we guard against running the CLI branch in production.
+if (!process.env.FUNCTION_NAME && process.argv.length > 2) {
   const filePath = process.argv[2];
   console.log("Received file path from arguments:", filePath);
   ingestFile(filePath)
