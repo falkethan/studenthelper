@@ -11,14 +11,14 @@ export async function handler(event, context) {
     let fileName = '';
 
     busboy.on('file', (fieldname, file, filename, encoding, mimetype) => {
-      // Use path.basename to strip directory components
-      fileName = path.basename(filename);
+      console.log("Original filename from client:", filename);
+      fileName = filename.split(/[\\/]/).pop();
       console.log("Sanitized filename:", fileName);
       file.on('data', (data) => {
         fileBuffer = Buffer.concat([fileBuffer, data]);
       });
     });
-
+    
     busboy.on('finish', async () => {
       try {
         const tempFilePath = path.join('/tmp', fileName);
