@@ -9,15 +9,23 @@ export async function handler(event, context) {
     const busboy = new Busboy({ headers: event.headers });
     let fileBuffer = Buffer.alloc(0);
     let fileName = '';
-
+    
     busboy.on('file', (fieldname, file, filename, encoding, mimetype) => {
       console.log("Original filename from client:", filename);
-      fileName = filename.split(/[\\/]/).pop();
+      fileName = filename.split(/[\\/]/).pop(); // This should already do the trick
+      // If there’s still an unwanted prefix, remove it explicitly:
+      if (fileName.startsWith("test/data/")) {
+        fileName = fileName.replace("test/data/", "");
+      }
+      if (fileName.startsWith("./test/data/")) {
+        fileName = fileName.replace("./test/data/", "");
+      }
       console.log("Sanitized filename:", fileName);
       file.on('data', (data) => {
         fileBuffer = Buffer.concat([fileBuffer, data]);
       });
     });
+    
     
     busboy.on('finish', async () => {
       try {
