@@ -1,7 +1,10 @@
 [functions]
-node_bundler = "esbuild"
-included_files = ["netlify/functions/*"]
-external_node_modules = ["openai"]
+  node_bundler = "esbuild"
+  external_node_modules = ["openai", "pdf-parse"]
+  included_files = [
+    "netlify/functions/*",
+    "node_modules/pdf-parse/**/*"
+  ]
 
 [functions."ask"]
-timeout = 26
+  timeout = 26
