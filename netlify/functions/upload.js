@@ -6,18 +6,13 @@ import { ingestFile } from './ingest_file_node.js';
 
 export async function handler(event, context) {
   return new Promise((resolve, reject) => {
-    // Set a file size limit (e.g., 50 MB)
-    const busboy = new Busboy({ 
-      headers: event.headers,
-      limits: {
-        fileSize: 50 * 1024 * 1024, // 50 MB
-      }
-    });
+    const busboy = new Busboy({ headers: event.headers });
     let fileBuffer = Buffer.alloc(0);
     let fileName = '';
 
     busboy.on('file', (fieldname, file, filename, encoding, mimetype) => {
-      fileName = filename;
+      // Sanitize filename to remove any directory paths
+      fileName = path.basename(filename);
       file.on('data', (data) => {
         fileBuffer = Buffer.concat([fileBuffer, data]);
       });
@@ -43,14 +38,6 @@ export async function handler(event, context) {
           body: JSON.stringify({ error: error.message }),
         });
       }
-    });
-
-    busboy.on('error', (err) => {
-      console.error("Busboy error:", err);
-      reject({
-        statusCode: 413, // Payload Too Large
-        body: JSON.stringify({ error: "File size exceeds limit." }),
-      });
     });
 
     // Busboy requires the body to be a Buffer when using Netlify functions.
