@@ -11,8 +11,9 @@ export async function handler(event, context) {
     let fileName = '';
 
     busboy.on('file', (fieldname, file, filename, encoding, mimetype) => {
-      // Sanitize filename to remove any directory paths
+      // Strip any directory paths from the filename
       fileName = path.basename(filename);
+      console.log("Sanitized filename:", fileName);
       file.on('data', (data) => {
         fileBuffer = Buffer.concat([fileBuffer, data]);
       });
@@ -21,6 +22,7 @@ export async function handler(event, context) {
     busboy.on('finish', async () => {
       try {
         const tempFilePath = path.join('/tmp', fileName);
+        console.log("Saving file to:", tempFilePath);
         fs.writeFileSync(tempFilePath, fileBuffer);
         console.log("File saved to", tempFilePath);
 
