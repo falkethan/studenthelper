@@ -1,3 +1,5 @@
+Current Index HTML
+```
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,116 +11,8 @@
         rel="stylesheet" 
         integrity="sha384-9ndCyUa3Y7rN2XvL0+8yA5jOc8wOj7B4cdzo5q35d8o8lUG5Fw6d1MRnQ+p4Bl6M" 
         crossorigin="anonymous">
-        
   <style>
     body {
-      /* Styled Chat Input Box */
-.input-group {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-}
-
-textarea#prompt {
-  width: 100%;
-  min-height: 50px;
-  max-height: 200px; /* Prevents it from expanding too much */
-  font-size: 16px;
-  padding: 12px;
-  border-radius: 8px;
-  border: 1px solid #555;
-  background: #2c2c2c;
-  color: #e0e0e0;
-  transition: all 0.2s ease-in-out;
-  resize: none;
-  overflow-y: hidden;
-}
-
-textarea#prompt:focus {
-  outline: none;
-  border-color: #007bff;
-}
-
-/* Expand input box when typing */
-textarea#prompt.expanded {
-  min-height: 80px;
-}
-
-button#send {
-  background: #007bff;
-  border: none;
-  border-radius: 8px;
-  font-weight: 500;
-  transition: background 0.3s ease, transform 0.2s ease;
-  width: 50px;
-  height: 50px;
-  font-size: 1.4rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-}
-
-button#send:hover {
-  background: #0056b3;
-  transform: scale(1.1);
-}
-
-    /* Styled File Upload Section */
-/* Styled File Upload Section */
-#file-upload-container {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 15px;
-}
-
-#uploadLabel {
-  background: #007bff;
-  color: white;
-  padding: 8px 15px;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background 0.3s ease;
-  display: inline-block;
-}
-
-#uploadLabel:hover {
-  background: #0056b3;
-}
-
-#uploadBtn {
-  background: #28a745;
-  color: white;
-  padding: 8px 15px;
-  border-radius: 5px;
-  border: none;
-  cursor: pointer;
-  transition: background 0.3s ease;
-}
-
-#uploadBtn:hover {
-  background: #218838;
-}
-
-
-/* Styled Preset Prompt Buttons */
-#preset-prompts button {
-  background: #6c757d;
-  border: none;
-  color: white;
-  padding: 8px 15px;
-  border-radius: 5px;
-  font-size: 14px;
-  transition: background 0.3s ease, transform 0.2s ease;
-}
-
-#preset-prompts button:hover {
-  background: #5a6268;
-  transform: scale(1.05);
-}
-
       background: #040026;
       color: #e0e0e0;
       font-family: 'Roboto', sans-serif;
@@ -241,34 +135,6 @@ button#send:hover {
         font-size: 1rem;
       }
     }
-    /* Notification Popup */
-/* ✅ Better Notification Popup */
-.notification {
-  display: none;
-  position: fixed;
-  top: 15px;
-  right: 20px;
-  background: #28a745;
-  color: white;
-  padding: 12px 18px;
-  border-radius: 6px;
-  font-size: 16px;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-  opacity: 0;
-  transition: opacity 0.4s ease, transform 0.3s ease-in-out;
-  transform: translateY(-10px);
-}
-
-.notification.show {
-  display: block;
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.notification.hide {
-  opacity: 0;
-  transform: translateY(-10px);
-}
   </style>
 </head>
 <body>
@@ -286,13 +152,10 @@ button#send:hover {
       </div>
 
     <!-- Add this section above your chatbot input -->
-    <div id="file-upload-container">
-      <input type="file" id="fileUpload" accept=".pdf,.pptx,.docx" hidden>
-      <label for="fileUpload" id="uploadLabel">Choose File</label>
-      <button id="uploadBtn">Upload</button>
-    </div>
-    
-    
+<div id="file-upload-container">
+  <input type="file" id="fileUpload" accept=".pdf,.pptx,.docx">
+  <button id="uploadBtn">Upload File</button>
+</div>
   
       <!-- Preset Prompt Buttons -->
       <div id="preset-prompts" class="mb-3">
@@ -526,103 +389,35 @@ button#send:hover {
         sendBtn.click();
       });
     });
-    const promptInput = document.getElementById('prompt');
-
-promptInput.addEventListener('input', function () {
-  this.style.height = '50px'; // Reset height
-  if (this.scrollHeight > 50) {
-    this.style.height = Math.min(this.scrollHeight, 200) + 'px'; // Expand gradually, max 200px
-  }
-});
-
   </script>
 
 <script>
-  // Function to show the notification popup
-function showNotification(message, bgColor) {
-  const notification = document.getElementById("notification");
-  notification.textContent = message;
-  notification.style.background = bgColor;
-  notification.classList.add("show");
-
-  setTimeout(() => {
-    notification.classList.add("hide");
-    setTimeout(() => {
-      notification.classList.remove("show", "hide");
-    }, 300);
-  }, 2500);
-}
-</script>
-<!-- Custom Notification -->
-<div id="notification" class="notification">File uploaded successfully!</div>
-<script>
-  document.addEventListener("DOMContentLoaded", function () {
+  document.getElementById("uploadBtn").addEventListener("click", async () => {
     const fileInput = document.getElementById("fileUpload");
-    const uploadLabel = document.getElementById("uploadLabel");
-    const uploadBtn = document.getElementById("uploadBtn");
-    const promptInput = document.getElementById("prompt");
+    const file = fileInput.files[0];
+    if (!file) {
+      alert("Please select a file to upload.");
+      return;
+    }
 
-    // ✅ Fix: Properly handles file selection and shows chosen filename
-    fileInput.addEventListener("change", function () {
-      if (fileInput.files.length > 0) {
-        uploadLabel.textContent = `📄 ${fileInput.files[0].name}`;
-      } else {
-        uploadLabel.textContent = "Choose File";
-      }
-    });
+    const formData = new FormData();
+    formData.append("file", file);
 
-    uploadBtn.addEventListener("click", async () => {
-      if (!fileInput.files.length) {
-        showNotification("Please select a file to upload.", "red");
-        return;
-      }
-
-      const formData = new FormData();
-      formData.append("file", fileInput.files[0]);
-
-      try {
-        const response = await fetch("/.netlify/functions/upload", {
-          method: "POST",
-          body: formData,
-        });
-
-        const result = await response.json();
-
-        if (result.success) {
-          showNotification("✅ File uploaded successfully!", "#28a745");
-        } else {
-          showNotification(result.message || "❌ Upload failed. Try again.", "red");
-        }
-      } catch (error) {
-        console.error("Upload error:", error);
-        showNotification("⚠️ Error uploading file.", "red");
-      }
-    });
-
-    // ✅ Improved Auto-Expanding Chatbox (Expands naturally, resets correctly)
-    promptInput.addEventListener("input", function () {
-      this.style.height = "50px";
-      if (this.scrollHeight > 50) {
-        this.style.height = Math.min(this.scrollHeight, 200) + "px";
-      }
-    });
-
-    // ✅ Optimized Notification Function (Longer duration, smoother animation)
-    function showNotification(message, bgColor) {
-      const notification = document.getElementById("notification");
-      notification.textContent = message;
-      notification.style.background = bgColor;
-      notification.classList.add("show");
-
-      setTimeout(() => {
-        notification.classList.add("hide");
-        setTimeout(() => {
-          notification.classList.remove("show", "hide");
-        }, 500);
-      }, 3500); // Keeps notification visible for 3.5 seconds
+    try {
+      const response = await fetch("/.netlify/functions/upload", {
+        method: "POST",
+        body: formData,
+      });
+      const result = await response.json();
+      console.log("Upload result:", result);
+      alert(result.message || "File processed successfully.");
+    } catch (error) {
+      console.error("Error uploading file:", error);
+      alert("File upload failed.");
     }
   });
 </script>
 
 </body>
 </html>
+```
