@@ -11,7 +11,7 @@ export async function handler(event, context) {
     let fileName = '';
 
     busboy.on('file', (fieldname, file, filename, encoding, mimetype) => {
-      // Strip any directory paths from the filename
+      // Use path.basename to strip directory components
       fileName = path.basename(filename);
       console.log("Sanitized filename:", fileName);
       file.on('data', (data) => {
