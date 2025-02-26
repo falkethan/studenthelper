@@ -2,7 +2,7 @@
 import Busboy from 'busboy';
 import fs from 'fs';
 import path from 'path';
-import { ingestFile } from './ingest_file_node.js'; // Ensure ingest_file_node.js exports a function named ingestFile
+import { ingestFile } from './ingest_file_node.js';
 
 export async function handler(event, context) {
   return new Promise((resolve, reject) => {
@@ -23,7 +23,7 @@ export async function handler(event, context) {
         fs.writeFileSync(tempFilePath, fileBuffer);
         console.log("File saved to", tempFilePath);
 
-        // Instead of calling a Python script, call the Node.js ingestion function directly:
+        // Call the ingestion function directly:
         await ingestFile(tempFilePath);
         
         resolve({
