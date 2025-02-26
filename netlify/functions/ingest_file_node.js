@@ -169,14 +169,6 @@ async function ingestFile(filePath) {
   await upsertVectors(vectors, namespace);
 }
 
-// Only run CLI ingestion if explicitly enabled via RUN_CLI.
-// Remove or set RUN_CLI to "true" only when you intend to run from the command line.
-if (process.env.RUN_CLI === "true" && process.argv.length > 2) {
-  const filePath = process.argv[2];
-  console.log("Received file path from arguments:", filePath);
-  ingestFile(filePath)
-    .then(() => console.log("File ingestion complete."))
-    .catch((err) => console.error("Error during ingestion:", err));
-}
-
+// Remove the CLI branch entirely.
+// This module now only exports ingestFile, which is meant to be invoked by your upload function.
 export { ingestFile };
