@@ -169,9 +169,9 @@ async function ingestFile(filePath) {
   await upsertVectors(vectors, namespace);
 }
 
-// Only run CLI ingestion if NOT running as a Netlify function.
-// Netlify sets process.env.FUNCTION_NAME, so we guard against running the CLI branch in production.
-if (!process.env.FUNCTION_NAME && process.argv.length > 2) {
+// Only run CLI ingestion if explicitly enabled via RUN_CLI.
+// Remove or set RUN_CLI to "true" only when you intend to run from the command line.
+if (process.env.RUN_CLI === "true" && process.argv.length > 2) {
   const filePath = process.argv[2];
   console.log("Received file path from arguments:", filePath);
   ingestFile(filePath)
