@@ -17,13 +17,13 @@
       font-family: 'Roboto', sans-serif;
       padding: 20px;
     }
-    /* Main container using flex layout: left for file upload, right for chat */
+    /* Main container: three columns */
     .main-container {
       display: flex;
       gap: 20px;
       align-items: flex-start;
     }
-    /* Drag & Drop Upload Area (Left Column) */
+    /* Left Column: Drag & Drop Upload Area */
     .dropzone-container {
       flex: 1;
       max-width: 300px;
@@ -43,6 +43,28 @@
     .dropzone-container p {
       margin: 0;
     }
+    /* Supported formats section inside dropzone */
+    .supported-formats {
+      margin-top: 15px;
+      font-size: 14px;
+      color: #aaa;
+    }
+    .supported-formats ul {
+      list-style: none;
+      padding-left: 0;
+      margin: 5px 0 0;
+    }
+    .supported-formats li {
+      display: inline-block;
+      margin-right: 10px;
+      vertical-align: middle;
+    }
+    .supported-formats img {
+      width: 24px;
+      height: 24px;
+      vertical-align: middle;
+      margin-right: 5px;
+    }
     /* Green Upload Button inside drop zone */
     #uploadBtn {
       margin-top: 15px;
@@ -57,7 +79,7 @@
     #uploadBtn:hover {
       background-color: #218838;
     }
-    /* Chat Container (Right Column) */
+    /* Center Column: Chat Container */
     .chat-container {
       flex: 2;
       background: #1e1e1e;
@@ -136,20 +158,50 @@
     button#send:hover {
       background: #0056b3;
     }
-    /* Preset prompt buttons styling */
+    /* Preset prompt buttons styling - updated for a cleaner look */
     #preset-prompts {
       margin-bottom: 15px;
       text-align: center;
     }
     #preset-prompts button {
       margin: 0 5px;
-      background: #6c757d;
+      background: #007bff;
       border: none;
       color: #fff;
       transition: background 0.3s ease;
+      padding: 8px 12px;
+      border-radius: 4px;
     }
     #preset-prompts button:hover {
-      background: #5a6268;
+      background: #0056b3;
+    }
+    /* Right Column: Info Panel */
+    .info-container {
+      flex: 1;
+      max-width: 300px;
+      background: #1e1e1e;
+      border-radius: 8px;
+      padding: 20px;
+      color: #ccc;
+    }
+    .info-container h3 {
+      color: #fff;
+      margin-bottom: 15px;
+    }
+    .info-container ul {
+      list-style: none;
+      padding-left: 0;
+    }
+    .info-container li {
+      margin-bottom: 10px;
+      padding-left: 20px;
+      position: relative;
+    }
+    .info-container li::before {
+      content: "•";
+      position: absolute;
+      left: 0;
+      color: #007bff;
     }
     /* Animated Progress Bar */
     #progressContainer {
@@ -211,7 +263,7 @@
       .main-container {
         flex-direction: column;
       }
-      .dropzone-container, .chat-container {
+      .dropzone-container, .chat-container, .info-container {
         max-width: 100%;
       }
       .input-group textarea {
@@ -228,14 +280,29 @@
 <body>
   <div class="container">
     <div class="main-container">
-      <!-- Drag & Drop / Upload Section (Left Column) -->
+      <!-- Left Column: Drag & Drop / Upload Section -->
       <div id="drop-zone" class="dropzone-container">
         <p>Drag & drop your file here<br>or click to select</p>
         <input type="file" id="fileUpload" accept=".pdf,.pptx,.docx" style="display: none;">
         <button id="uploadBtn" class="btn">Upload File</button>
+        <!-- Supported Document Formats with Minimal Logos -->
+        <div class="supported-formats">
+          <p>Supported documents:</p>
+          <ul class="list-inline">
+            <li class="list-inline-item">
+              <img src="assets/pdf-logo.png" alt="PDF"> .pdf
+            </li>
+            <li class="list-inline-item">
+              <img src="assets/docx-logo.png" alt="DOCX"> .docx
+            </li>
+            <li class="list-inline-item">
+              <img src="assets/pptx-logo.png" alt="PPTX"> .pptx
+            </li>
+          </ul>
+        </div>
       </div>
 
-      <!-- Chat Section (Right Column) -->
+      <!-- Center Column: Chat Section -->
       <div class="chat-container">
         <div class="chat-header">
           <img src="assets/bloobot-logo.png" alt="Bloo Profile Picture">
@@ -250,14 +317,31 @@
         
         <!-- Preset Prompt Buttons -->
         <div id="preset-prompts" class="mb-3">
-          <button class="btn btn-secondary preset-btn" data-prompt="I need help with my homework">Help with homework</button>
-          <button class="btn btn-secondary preset-btn" data-prompt="I want you to summarize this reading for my class">Summarize reading</button>
-          <button class="btn btn-secondary preset-btn" data-prompt="What can you help me with?">More</button>
+          <button class="btn preset-btn" data-prompt="I need help with my homework">Help with homework</button>
+          <button class="btn preset-btn" data-prompt="I want you to summarize this reading for my class">Summarize reading</button>
+          <button class="btn preset-btn" data-prompt="What can you help me with?">More</button>
         </div>
         
         <div class="input-group mb-3">
           <textarea id="prompt" class="form-control" placeholder="Hey, I'm Bloo. What class can I help you with?" rows="1" style="resize: none;"></textarea>
           <button id="send" class="btn">&#8594;</button>
+        </div>
+      </div>
+
+      <!-- Right Column: Information Panel -->
+      <div class="info-container">
+        <h3>What Bloo Can Do</h3>
+        <ul>
+          <li>Analyze your coursework files</li>
+          <li>Break down homework & assignments</li>
+          <li>Provide step-by-step guidance</li>
+          <li>Customize responses (coursework-specific or general)</li>
+          <li>Promote deeper learning through interactive explanations</li>
+        </ul>
+        <!-- Prototype slider placeholder -->
+        <div class="slider-prototype mt-4">
+          <input type="range" min="0" max="100" value="50" style="width: 100%;">
+          <small class="d-block mt-1 text-muted">This is a prototype. This does not work yet.</small>
         </div>
       </div>
     </div>
@@ -278,7 +362,6 @@
     const promptEl = document.getElementById('prompt');
     const sendBtn = document.getElementById('send');
 
-    // Automatically detect correct API URL
     const API_URL =
       window.location.hostname === "localhost"
         ? "http://localhost:8888/.netlify/functions/ask"
