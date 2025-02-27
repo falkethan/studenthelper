@@ -10,15 +10,55 @@
         integrity="sha384-9ndCyUa3Y7rN2XvL0+8yA5jOc8wOj7B4cdzo5q35d8o8lUG5Fw6d1MRnQ+p4Bl6M" 
         crossorigin="anonymous">
   <style>
+    /* Global Styles */
     body {
       background: #040026;
       color: #e0e0e0;
       font-family: 'Roboto', sans-serif;
       padding: 20px;
     }
+    /* Main container using flex layout: left for file upload, right for chat */
+    .main-container {
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+    }
+    /* Drag & Drop Upload Area (Left Column) */
+    .dropzone-container {
+      flex: 1;
+      max-width: 300px;
+      background: #1e1e1e;
+      border: 2px dashed #007bff;
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+      color: #ccc;
+      transition: background 0.3s ease;
+      cursor: pointer;
+    }
+    .dropzone-container.hover {
+      background: #2c2c2c;
+    }
+    .dropzone-container p {
+      margin: 0;
+    }
+    /* Green Upload Button inside drop zone */
+    #uploadBtn {
+      margin-top: 15px;
+      padding: 10px 20px;
+      background-color: #28a745;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    #uploadBtn:hover {
+      background-color: #218838;
+    }
+    /* Chat Container (Right Column) */
     .chat-container {
-      max-width: 600px;
-      margin: auto;
+      flex: 2;
       background: #1e1e1e;
       padding: 20px;
       border-radius: 8px;
@@ -95,15 +135,22 @@
     button#send:hover {
       background: #0056b3;
     }
-    /* Styles for the preset prompt buttons */
+    /* Preset prompt buttons styling */
     #preset-prompts {
       margin-bottom: 15px;
       text-align: center;
     }
     #preset-prompts button {
       margin: 0 5px;
+      background: #6c757d;
+      border: none;
+      color: #fff;
+      transition: background 0.3s ease;
     }
-    /* Styles for the animated progress bar */
+    #preset-prompts button:hover {
+      background: #5a6268;
+    }
+    /* Animated Progress Bar */
     #progressContainer {
       width: 100%;
       height: 4px;
@@ -120,9 +167,51 @@
       background-color: #ffffff;
       transition: width 0.2s ease-in-out;
     }
+    /* Loading Overlay */
+    #loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+    .spinner {
+      border: 8px solid #f3f3f3;
+      border-top: 8px solid #007bff;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    /* Notification Popup */
+    #notification-popup {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #28a745;
+      color: #fff;
+      padding: 15px 20px;
+      border-radius: 5px;
+      display: none;
+      z-index: 10000;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
     @media (max-width: 576px) {
-      .chat-container {
-        padding: 15px;
+      .main-container {
+        flex-direction: column;
+      }
+      .dropzone-container, .chat-container {
+        max-width: 100%;
       }
       .input-group textarea {
         width: 70%;
@@ -137,44 +226,56 @@
 </head>
 <body>
   <div class="container">
-    <div class="chat-container">
-      <div class="chat-header">
-        <img src="assets/bloobot-logo.png" alt="Bloo Profile Picture">
-        <h2>Bloo</h2>
-      </div>
-      <div class="messages mb-3" id="messages"></div>
-      
-      <!-- Animated Progress Bar -->
-      <div id="progressContainer">
-        <div id="progressBar"></div>
+    <div class="main-container">
+      <!-- Drag & Drop / Upload Section (Left Column) -->
+      <div id="drop-zone" class="dropzone-container">
+        <p>Drag & drop your file here<br>or click to select</p>
+        <input type="file" id="fileUpload" accept=".pdf,.pptx,.docx" style="display: none;">
+        <button id="uploadBtn" class="btn">Upload File</button>
       </div>
 
-    <!-- Add this section above your chatbot input -->
-<div id="file-upload-container">
-  <input type="file" id="fileUpload" accept=".pdf,.pptx,.docx">
-  <button id="uploadBtn">Upload File</button>
-</div>
-  
-      <!-- Preset Prompt Buttons -->
-      <div id="preset-prompts" class="mb-3">
-        <button class="btn btn-secondary preset-btn" data-prompt="I need help with my homework">Help with homework</button>
-        <button class="btn btn-secondary preset-btn" data-prompt="I want you to summarize this reading for my class">Summarize reading</button>
-        <button class="btn btn-secondary preset-btn" data-prompt="What can you help me with?">More</button>
-      </div>
-
-      <div class="input-group mb-3">
-        <textarea id="prompt" class="form-control" placeholder="Hey, I'm Bloo. What class can I help you with?" rows="1" style="resize: none;"></textarea>
-        <button id="send" class="btn">&#8594;</button>
+      <!-- Chat Section (Right Column) -->
+      <div class="chat-container">
+        <div class="chat-header">
+          <img src="assets/bloobot-logo.png" alt="Bloo Profile Picture">
+          <h2>Bloo</h2>
+        </div>
+        <div class="messages mb-3" id="messages"></div>
+        
+        <!-- Animated Progress Bar -->
+        <div id="progressContainer">
+          <div id="progressBar"></div>
+        </div>
+        
+        <!-- Preset Prompt Buttons -->
+        <div id="preset-prompts" class="mb-3">
+          <button class="btn btn-secondary preset-btn" data-prompt="I need help with my homework">Help with homework</button>
+          <button class="btn btn-secondary preset-btn" data-prompt="I want you to summarize this reading for my class">Summarize reading</button>
+          <button class="btn btn-secondary preset-btn" data-prompt="What can you help me with?">More</button>
+        </div>
+        
+        <div class="input-group mb-3">
+          <textarea id="prompt" class="form-control" placeholder="Hey, I'm Bloo. What class can I help you with?" rows="1" style="resize: none;"></textarea>
+          <button id="send" class="btn">&#8594;</button>
+        </div>
       </div>
     </div>
   </div>
 
+  <!-- Loading Overlay -->
+  <div id="loading-overlay">
+    <div class="spinner"></div>
+  </div>
+
+  <!-- Notification Popup -->
+  <div id="notification-popup">File uploaded successfully!</div>
+
   <script>
+    // Chat and streaming functionality
     let conversation = [];
     const messagesEl = document.getElementById('messages');
     const promptEl = document.getElementById('prompt');
     const sendBtn = document.getElementById('send');
-    // Removed spinner; using progress bar instead
 
     // Automatically detect correct API URL
     const API_URL =
@@ -287,9 +388,9 @@
     function typeWriter(text, element, speed = 30) {
       let i = 0;
       const interval = setInterval(() => {
-        element.textContent += text.charAt(i);
+        element.innerHTML = "<strong>Bloo: </strong>" + markdownToHTML(text.substring(0, i));
         i++;
-        if (i >= text.length) clearInterval(interval);
+        if (i > text.length) clearInterval(interval);
       }, speed);
     }
 
@@ -349,7 +450,6 @@
       addMessage("You: " + promptText, 'user');
       promptEl.value = '';
       
-      // Start progress bar
       startProgress();
   
       try {
@@ -369,7 +469,6 @@
         console.error(err);
         addMessage("Bloo: Error connecting to server.", 'bot');
       } finally {
-        // Finish progress bar
         finishProgress();
       }
     });
@@ -387,34 +486,91 @@
         sendBtn.click();
       });
     });
-  </script>
 
-<script>
-  document.getElementById("uploadBtn").addEventListener("click", async () => {
+    // File upload logic for drag-and-drop and manual selection
+    const dropZone = document.getElementById("drop-zone");
     const fileInput = document.getElementById("fileUpload");
-    const file = fileInput.files[0];
-    if (!file) {
-      alert("Please select a file to upload.");
-      return;
+    let fileBuffer = null;
+    let fileName = '';
+
+    // When dropZone is clicked, trigger file input click
+    dropZone.addEventListener("click", () => {
+      fileInput.click();
+    });
+
+    // Handle drag events
+    dropZone.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      dropZone.classList.add("hover");
+    });
+
+    dropZone.addEventListener("dragleave", (e) => {
+      e.preventDefault();
+      dropZone.classList.remove("hover");
+    });
+
+    dropZone.addEventListener("drop", (e) => {
+      e.preventDefault();
+      dropZone.classList.remove("hover");
+      const droppedFiles = e.dataTransfer.files;
+      if (droppedFiles.length) {
+        fileName = droppedFiles[0].name.split(/[\\/]/).pop();
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          fileBuffer = new Uint8Array(event.target.result);
+          uploadFile();
+        };
+        reader.readAsArrayBuffer(droppedFiles[0]);
+      }
+    });
+
+    // Handle file selection via file input
+    fileInput.addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        fileName = file.name.split(/[\\/]/).pop();
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          fileBuffer = new Uint8Array(event.target.result);
+          uploadFile();
+        };
+        reader.readAsArrayBuffer(file);
+      }
+    });
+
+    // Upload file function using FormData
+    async function uploadFile() {
+      if (!fileBuffer) {
+        alert("File reading failed. Please try again.");
+        return;
+      }
+      document.getElementById("loading-overlay").style.display = "flex";
+
+      const formData = new FormData();
+      const blob = new Blob([fileBuffer]);
+      formData.append("file", blob, fileName);
+
+      try {
+        const response = await fetch("/.netlify/functions/upload", {
+          method: "POST",
+          body: formData,
+        });
+        const result = await response.json();
+        console.log("Upload result:", result);
+        // Show success notification with animation
+        const notification = document.getElementById("notification-popup");
+        notification.textContent = result.message || "File uploaded successfully!";
+        notification.style.display = "block";
+        setTimeout(() => {
+          notification.style.display = "none";
+        }, 3000);
+      } catch (error) {
+        console.error("Error uploading file:", error);
+        alert("File upload failed.");
+      } finally {
+        document.getElementById("loading-overlay").style.display = "none";
+      }
     }
-
-    const formData = new FormData();
-    formData.append("file", file);
-
-    try {
-      const response = await fetch("/.netlify/functions/upload", {
-        method: "POST",
-        body: formData,
-      });
-      const result = await response.json();
-      console.log("Upload result:", result);
-      alert(result.message || "File processed successfully.");
-    } catch (error) {
-      console.error("Error uploading file:", error);
-      alert("File upload failed.");
-    }
-  });
-</script>
-
+  </script>
 </body>
 </html>
