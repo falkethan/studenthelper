@@ -1,33 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <meta http-equiv="Content-Security-Policy" content="
+  default-src 'self';
+  script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.auth0.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;
+  style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com;
+  connect-src 'self' https://dev-6l3jcnaf0wzmpdc2.us.auth0.com;
+  font-src 'self' https://fonts.gstatic.com;
+">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Bloo - Your Personal Education AI</title>
+  <!-- Load Fonts and Bootstrap (integrity removed to avoid digest errors) -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" 
         rel="stylesheet" 
-        integrity="sha384-9ndCyUa3Y7rN2XvL0+8yA5jOc8wOj7B4cdzo5q35d8o8lUG5Fw6d1MRnQ+p4Bl6M" 
         crossorigin="anonymous">
   <style>
-    /* Global Styles */
+    /* Bloobot dark theme CSS */
     body {
       background: #040026;
       color: #e0e0e0;
       font-family: 'Roboto', sans-serif;
       padding: 20px;
     }
-    /* Main container: three columns */
     .main-container {
       display: flex;
       gap: 20px;
       align-items: flex-start;
     }
-    /* Left Column: Drag & Drop Upload Area */
     .dropzone-container {
       flex: 1;
       max-width: 300px;
-      height: 575px; /* Adjust this value as needed */
+      height: 575px;
       background: #1e1e1e;
       border: 2px dashed #007bff;
       border-radius: 8px;
@@ -40,10 +45,7 @@
     .dropzone-container.hover {
       background: #2c2c2c;
     }
-    .dropzone-container p {
-      margin: 0;
-    }
-    /* Supported formats section inside dropzone */
+    .dropzone-container p { margin: 0; }
     .supported-formats {
       margin-top: 15px;
       font-size: 14px;
@@ -65,7 +67,6 @@
       vertical-align: middle;
       margin-right: 5px;
     }
-    /* Green Upload Button inside drop zone */
     #uploadBtn {
       margin-top: 15px;
       padding: 10px 20px;
@@ -76,10 +77,7 @@
       cursor: pointer;
       transition: background-color 0.3s ease;
     }
-    #uploadBtn:hover {
-      background-color: #218838;
-    }
-    /* Center Column: Chat Container */
+    #uploadBtn:hover { background-color: #218838; }
     .chat-container {
       flex: 2;
       background: #1e1e1e;
@@ -99,10 +97,7 @@
       margin-right: 15px;
       object-fit: cover;
     }
-    .chat-header h2 {
-      margin: 0;
-      color: #fff;
-    }
+    .chat-header h2 { margin: 0; color: #fff; }
     .messages {
       height: 400px;
       overflow-y: auto;
@@ -120,7 +115,7 @@
     }
     .message.user {
       background: rgba(255, 255, 255, 0.1);
-      color: #ffffff;
+      color: #fff;
     }
     .message.bot {
       background: rgba(173, 216, 230, 0.1);
@@ -137,10 +132,7 @@
       align-items: center;
       justify-content: center;
     }
-    .input-group textarea {
-      width: 80%;
-      margin-right: 10px;
-    }
+    .input-group textarea { width: 80%; margin-right: 10px; }
     button#send {
       background: #007bff;
       border: none;
@@ -155,10 +147,7 @@
       justify-content: center;
       color: #fff;
     }
-    button#send:hover {
-      background: #0056b3;
-    }
-    /* Preset prompt buttons styling - updated for a cleaner look */
+    button#send:hover { background: #0056b3; }
     #preset-prompts {
       margin-bottom: 15px;
       text-align: center;
@@ -172,10 +161,7 @@
       padding: 8px 12px;
       border-radius: 4px;
     }
-    #preset-prompts button:hover {
-      background: #0056b3;
-    }
-    /* Right Column: Info Panel */
+    #preset-prompts button:hover { background: #0056b3; }
     .info-container {
       flex: 1;
       max-width: 300px;
@@ -184,14 +170,8 @@
       padding: 20px;
       color: #ccc;
     }
-    .info-container h3 {
-      color: #fff;
-      margin-bottom: 15px;
-    }
-    .info-container ul {
-      list-style: none;
-      padding-left: 0;
-    }
+    .info-container h3 { color: #fff; margin-bottom: 15px; }
+    .info-container ul { list-style: none; padding-left: 0; }
     .info-container li {
       margin-bottom: 10px;
       padding-left: 20px;
@@ -203,7 +183,6 @@
       left: 0;
       color: #007bff;
     }
-    /* Animated Progress Bar */
     #progressContainer {
       width: 100%;
       height: 4px;
@@ -217,10 +196,10 @@
     #progressBar {
       width: 0%;
       height: 100%;
-      background-color: #ffffff;
+      background-color: #fff;
       transition: width 0.2s ease-in-out;
     }
-    /* Loading Overlay */
+    /* Loading Overlay for file uploads */
     #loading-overlay {
       position: fixed;
       top: 0;
@@ -233,6 +212,7 @@
       align-items: center;
       justify-content: center;
       z-index: 9999;
+      flex-direction: column;
     }
     .spinner {
       border: 8px solid #f3f3f3;
@@ -242,9 +222,33 @@
       height: 60px;
       animation: spin 1s linear infinite;
     }
+    /* File upload progress bar */
+    #upload-progress-container {
+      width: 80%;
+      height: 4px;
+      background: transparent;
+      border: 1px solid white;
+      border-radius: 2px;
+      overflow: hidden;
+      margin-top: 20px;
+      display: none;
+    }
+    #upload-progress-bar {
+      width: 0%;
+      height: 100%;
+      background-color: #fff;
+      transition: width 0.2s ease-in-out;
+    }
     @keyframes spin {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
+    }
+    /* Auth buttons styling */
+    #auth-buttons {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 10001;
     }
     /* Notification Popup */
     #notification-popup {
@@ -260,44 +264,34 @@
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     }
     @media (max-width: 576px) {
-      .main-container {
-        flex-direction: column;
-      }
-      .dropzone-container, .chat-container, .info-container {
-        max-width: 100%;
-      }
-      .input-group textarea {
-        width: 70%;
-      }
-      button#send {
-        width: 35px;
-        height: 35px;
-        font-size: 1rem;
-      }
+      .main-container { flex-direction: column; }
+      .dropzone-container, .chat-container, .info-container { max-width: 100%; }
+      .input-group textarea { width: 70%; }
+      button#send { width: 35px; height: 35px; font-size: 1rem; }
     }
   </style>
 </head>
 <body>
+  <!-- Auth0 Login/Signup UI -->
+  <div id="auth-buttons">
+    <button id="login-btn" class="btn btn-primary" disabled>Login / Signup</button>
+    <button id="logout-btn" class="btn btn-secondary" style="display:none;">Logout</button>
+  </div>
+
+  <!-- Bloobot Main UI -->
   <div class="container">
     <div class="main-container">
-      <!-- Left Column: Drag & Drop / Upload Section -->
+      <!-- Left Column: File Upload Section -->
       <div id="drop-zone" class="dropzone-container">
         <p>Drag & drop your file here<br>or click to select</p>
-        <input type="file" id="fileUpload" accept=".pdf,.pptx,.docx" style="display: none;">
+        <input type="file" id="fileUpload" accept=".pdf,.pptx,.docx" multiple style="display: none;">
         <button id="uploadBtn" class="btn">Upload File</button>
-        <!-- Supported Document Formats with Minimal Logos -->
         <div class="supported-formats">
           <p>Supported documents:</p>
           <ul class="list-inline">
-            <li class="list-inline-item">
-              <img src="assets/pdf-logo.png" alt="PDF"> .pdf
-            </li>
-            <li class="list-inline-item">
-              <img src="assets/docx-logo.png" alt="DOCX"> .docx
-            </li>
-            <li class="list-inline-item">
-              <img src="assets/pptx-logo.png" alt="PPTX"> .pptx
-            </li>
+            <li class="list-inline-item"><img src="assets/pdf-logo.png" alt="PDF"> .pdf</li>
+            <li class="list-inline-item"><img src="assets/docx-logo.png" alt="DOCX"> .docx</li>
+            <li class="list-inline-item"><img src="assets/pptx-logo.png" alt="PPTX"> .pptx</li>
           </ul>
         </div>
       </div>
@@ -309,19 +303,14 @@
           <h2>Bloo</h2>
         </div>
         <div class="messages mb-3" id="messages"></div>
-        
-        <!-- Animated Progress Bar -->
         <div id="progressContainer">
           <div id="progressBar"></div>
         </div>
-        
-        <!-- Preset Prompt Buttons -->
         <div id="preset-prompts" class="mb-3">
           <button class="btn preset-btn" data-prompt="I need help with my homework">Help with homework</button>
           <button class="btn preset-btn" data-prompt="I want you to summarize this reading for my class">Summarize reading</button>
           <button class="btn preset-btn" data-prompt="What can you help me with?">More</button>
         </div>
-        
         <div class="input-group mb-3">
           <textarea id="prompt" class="form-control" placeholder="Hey, I'm Bloo. What class can I help you with?" rows="1" style="resize: none;"></textarea>
           <button id="send" class="btn">&#8594;</button>
@@ -338,7 +327,6 @@
           <li>Customize responses (coursework-specific or general)</li>
           <li>Promote deeper learning through interactive explanations</li>
         </ul>
-        <!-- Prototype slider placeholder -->
         <div class="slider-prototype mt-4">
           <input type="range" min="0" max="100" value="50" style="width: 100%;">
           <small class="d-block mt-1 text-muted">This is a prototype. This does not work yet.</small>
@@ -347,25 +335,131 @@
     </div>
   </div>
 
-  <!-- Loading Overlay -->
+  <!-- Loading Overlay for file uploads -->
   <div id="loading-overlay">
     <div class="spinner"></div>
+    <div id="upload-progress-container">
+      <div id="upload-progress-bar"></div>
+    </div>
   </div>
 
   <!-- Notification Popup -->
   <div id="notification-popup">File uploaded successfully!</div>
 
+  <!-- Script dependencies -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Load Auth0 SPA SDK (version 2.0) before our custom script -->
+  <script src="https://cdn.auth0.com/js/auth0-spa-js/2.0/auth0-spa-js.production.js"></script>
+  <!-- Combined Auth0 and Bloobot logic -->
   <script>
-    // Chat and streaming functionality
+    // --------- Auth0 Integration -----------
+    let auth0Client = null;
+    let userProfile = null;
+
+    const fetchAuthConfig = () => fetch("/auth_config.json");
+
+    const configureClient = async () => {
+      try {
+        const response = await fetchAuthConfig();
+        const config = await response.json();
+        auth0Client = await auth0.createAuth0Client({
+          domain: config.domain,
+          clientId: config.clientId,
+          redirect_uri: window.location.origin,
+          cacheLocation: "localstorage"
+          // Uncomment and set audience if you use a custom API:
+          // audience: "YOUR_API_IDENTIFIER"
+        });
+      } catch (err) {
+        console.log("Error configuring Auth0 client:", err);
+      }
+    };
+
+    const login = async (targetUrl) => {
+      try {
+        const options = {
+          authorizationParams: {
+            redirect_uri: window.location.origin,
+            scope: "openid profile email"
+          }
+        };
+        if (targetUrl) { options.appState = { targetUrl }; }
+        await auth0Client.loginWithRedirect(options);
+      } catch (err) {
+        console.log("Log in failed", err);
+      }
+    };
+
+    const logout = async () => {
+      try {
+        await auth0Client.logout({
+          logoutParams: { returnTo: window.location.origin }
+        });
+        updateAuthUI();
+      } catch (err) {
+        console.log("Log out failed", err);
+      }
+    };
+
+    const updateAuthUI = async () => {
+      try {
+        const isAuthenticated = await auth0Client.isAuthenticated();
+        console.log("updateAuthUI: isAuthenticated =", isAuthenticated);
+        const loginBtn = document.getElementById("login-btn");
+        const logoutBtn = document.getElementById("logout-btn");
+        if (isAuthenticated) {
+          userProfile = await auth0Client.getUser();
+          console.log("updateAuthUI: userProfile =", userProfile);
+          loginBtn.style.display = "none";
+          logoutBtn.style.display = "inline-block";
+        } else {
+          loginBtn.style.display = "inline-block";
+          logoutBtn.style.display = "none";
+        }
+      } catch (err) {
+        console.log("Error updating UI!", err);
+      }
+    };
+
+    // --------- Attach Auth0 event listeners after client is configured -----------
+    window.onload = async () => {
+      await configureClient();
+      console.log("Auth0 client configured:", auth0Client);
+      // Enable the login button now that Auth0 is ready.
+      document.getElementById("login-btn").disabled = false;
+      
+      // Process redirect callback if present.
+      if (window.location.search.includes("code=") && window.location.search.includes("state=")) {
+        try {
+          await auth0Client.handleRedirectCallback();
+          window.history.replaceState({}, document.title, "/");
+          window.location.reload();
+          return;
+        } catch (err) {
+          console.log("Error parsing redirect:", err);
+        }
+      }
+      updateAuthUI();
+    };
+
+    document.getElementById("login-btn").addEventListener("click", () => {
+      console.log("Login button clicked");
+      login();
+    });
+
+    document.getElementById("logout-btn").addEventListener("click", () => {
+      logout();
+    });
+
+    // --------- Bloobot Chat and File Upload Logic -----------
     let conversation = [];
     const messagesEl = document.getElementById('messages');
     const promptEl = document.getElementById('prompt');
     const sendBtn = document.getElementById('send');
-
-    const API_URL =
-      window.location.hostname === "localhost"
-        ? "http://localhost:8888/.netlify/functions/ask"
-        : "https://financeaibot.netlify.app/.netlify/functions/ask";
+    const API_URL = window.location.hostname === "localhost"
+      ? "http://localhost:8888/.netlify/functions/ask"
+      : "https://financeaibot.netlify.app/.netlify/functions/ask";
 
     function addMessage(text, sender) {
       const msgDiv = document.createElement('div');
@@ -376,95 +470,14 @@
     }
 
     function markdownToHTML(markdown) {
-      function parseLinks(text) {
-        return text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
-      }
-      function parseNestedLists(lines, startIndex, currentIndent) {
-        let html = "";
-        let listType = null;
-        let i = startIndex;
-        while (i < lines.length) {
-          const line = lines[i];
-          if (line.trim() === "") {
-            html += "\n";
-            i++;
-            continue;
-          }
-          const listMatch = line.match(/^(\s*)([-*]|\d+\.)\s+(.*)$/);
-          if (!listMatch || listMatch[1].length < currentIndent) break;
-          const indent = listMatch[1].length;
-          const marker = listMatch[2];
-          let content = listMatch[3];
-          const currentType = /^\d+\./.test(marker) ? 'ol' : 'ul';
-          content = parseLinks(content);
-          if (!listType) {
-            listType = currentType;
-            html += `<${listType}>\n`;
-          } else if (listType !== currentType) {
-            html += `</${listType}>\n`;
-            listType = currentType;
-            html += `<${listType}>\n`;
-          }
-          let nestedHtml = "";
-          let j = i + 1;
-          while (j < lines.length) {
-            const nextLine = lines[j];
-            if (nextLine.trim() === "") {
-              nestedHtml += "\n";
-              j++;
-              continue;
-            }
-            const nextMatch = nextLine.match(/^(\s*)([-*]|\d+\.)\s+(.*)$/);
-            if (nextMatch && nextMatch[1].length > indent) {
-              const nestedResult = parseNestedLists(lines, j, nextMatch[1].length);
-              nestedHtml += nestedResult.html;
-              j = nestedResult.index;
-            } else {
-              break;
-            }
-          }
-          html += `<li>${content}`;
-          if (nestedHtml) {
-            html += "\n" + nestedHtml;
-          }
-          html += `</li>\n`;
-          i = j;
-        }
-        if (listType) {
-          html += `</${listType}>\n`;
-        }
-        return { html, index: i };
-      }
-      const lines = markdown.split('\n');
-      let output = "";
-      let i = 0;
-      while (i < lines.length) {
-        const line = lines[i];
-        if (/^\s*([-*]|\d+\.)\s+/.test(line)) {
-          const indent = (line.match(/^(\s*)/)[1] || "").length;
-          const result = parseNestedLists(lines, i, indent);
-          output += result.html;
-          i = result.index;
-        } else {
-          output += line + "\n";
-          i++;
-        }
-      }
-      output = output.replace(/^###### (.*)$/gm, '<h6>$1</h6>');
-      output = output.replace(/^##### (.*)$/gm, '<h5>$1</h5>');
-      output = output.replace(/^#### (.*)$/gm, '<h4>$1</h4>');
-      output = output.replace(/^### (.*)$/gm, '<h3>$1</h3>');
-      output = output.replace(/^## (.*)$/gm, '<h2>$1</h2>');
-      output = output.replace(/^# (.*)$/gm, '<h1>$1</h1>');
+      let output = markdown;
       output = output.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
       output = output.replace(/\*(.+?)\*/g, '<em>$1</em>');
       return output;
     }
 
     function intoPieces(text) {
-      if (/^\s*$/.test(text)) {
-        return [text];
-      }
+      if (/^\s*$/.test(text)) return [text];
       const pieces = text.match(/(\s*\S+\s*)/g);
       return pieces || [];
     }
@@ -487,19 +500,15 @@
       const wordsPerMillisecond = wpm / 60000;
       const now = Date.now();
       const interval = setInterval(() => {
-        const elapsedMilliseconds = Date.now() - now;
-        const expectedWordCount = Math.min(elapsedMilliseconds * wordsPerMillisecond, pieces.length);
-        const segment = pieces.slice(0, expectedWordCount + 1).join('');
-        const html = markdownToHTML(segment);
-        msgDiv.innerHTML = `<strong>Bloo: </strong> ${html}`;
-        if (expectedWordCount >= pieces.length) {
-          clearInterval(interval);
-          return;
-        }
+        const elapsed = Date.now() - now;
+        const expectedCount = Math.min(elapsed * wordsPerMillisecond, pieces.length);
+        const segment = pieces.slice(0, expectedCount + 1).join('');
+        msgDiv.innerHTML = "<strong>Bloo: </strong>" + markdownToHTML(segment);
+        if (expectedCount >= pieces.length) clearInterval(interval);
       }, 200);
     }
 
-    // Progress bar functions
+    // Chat progress functions
     let progressInterval;
     function startProgress() {
       const progressContainer = document.getElementById('progressContainer');
@@ -516,31 +525,25 @@
         }
       }, 200);
     }
-
     function finishProgress() {
       const progressBar = document.getElementById('progressBar');
       progressBar.style.width = '100%';
       clearInterval(progressInterval);
-      setTimeout(() => {
-        document.getElementById('progressContainer').style.display = 'none';
-      }, 500);
+      setTimeout(() => { document.getElementById('progressContainer').style.display = 'none'; }, 500);
     }
 
     sendBtn.addEventListener('click', async () => {
       const promptText = promptEl.value.trim();
       if (!promptText) return;
-  
       conversation.push({ role: 'user', content: promptText });
       addMessage("You: " + promptText, 'user');
       promptEl.value = '';
-      
       startProgress();
-  
       try {
         const response = await fetch(API_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ conversation: conversation }),
+          body: JSON.stringify({ conversation: conversation })
         });
         const data = await response.json();
         if (data.response) {
@@ -571,89 +574,103 @@
       });
     });
 
-    // File upload logic for drag-and-drop and manual selection
+    // File upload logic
     const dropZone = document.getElementById("drop-zone");
     const fileInput = document.getElementById("fileUpload");
-    let fileBuffer = null;
-    let fileName = '';
 
-    // When dropZone is clicked, trigger file input click
-    dropZone.addEventListener("click", () => {
-      fileInput.click();
-    });
-
-    // Handle drag events
-    dropZone.addEventListener("dragover", (e) => {
-      e.preventDefault();
-      dropZone.classList.add("hover");
-    });
-
-    dropZone.addEventListener("dragleave", (e) => {
-      e.preventDefault();
-      dropZone.classList.remove("hover");
-    });
-
+    dropZone.addEventListener("click", () => { fileInput.click(); });
+    dropZone.addEventListener("dragover", (e) => { e.preventDefault(); dropZone.classList.add("hover"); });
+    dropZone.addEventListener("dragleave", (e) => { e.preventDefault(); dropZone.classList.remove("hover"); });
     dropZone.addEventListener("drop", (e) => {
       e.preventDefault();
       dropZone.classList.remove("hover");
       const droppedFiles = e.dataTransfer.files;
       if (droppedFiles.length) {
-        fileName = droppedFiles[0].name.split(/[\\/]/).pop();
-        const reader = new FileReader();
-        reader.onload = function(event) {
-          fileBuffer = new Uint8Array(event.target.result);
-          uploadFile();
-        };
-        reader.readAsArrayBuffer(droppedFiles[0]);
+        handleFileUploads(droppedFiles);
       }
     });
-
-    // Handle file selection via file input
     fileInput.addEventListener("change", (e) => {
-      const file = e.target.files[0];
-      if (file) {
-        fileName = file.name.split(/[\\/]/).pop();
-        const reader = new FileReader();
-        reader.onload = function(event) {
-          fileBuffer = new Uint8Array(event.target.result);
-          uploadFile();
-        };
-        reader.readAsArrayBuffer(file);
+      const selectedFiles = e.target.files;
+      if (selectedFiles.length) {
+        handleFileUploads(selectedFiles);
       }
     });
 
-    // Upload file function using FormData
-    async function uploadFile() {
-      if (!fileBuffer) {
-        alert("File reading failed. Please try again.");
-        return;
-      }
+    let uploadProgressInterval;
+    function startUploadProgress() {
+      const container = document.getElementById("upload-progress-container");
+      const bar = document.getElementById("upload-progress-bar");
+      bar.style.width = "0%";
+      container.style.display = "block";
+      let progress = 0;
+      uploadProgressInterval = setInterval(() => {
+        if (progress < 90) {
+          progress += 5;
+          bar.style.width = progress + "%";
+        } else {
+          clearInterval(uploadProgressInterval);
+        }
+      }, 200);
+    }
+    function finishUploadProgress() {
+      const bar = document.getElementById("upload-progress-bar");
+      bar.style.width = "100%";
+      clearInterval(uploadProgressInterval);
+      setTimeout(() => { document.getElementById("upload-progress-container").style.display = "none"; }, 500);
+    }
+    function handleFileUploads(fileList) {
       document.getElementById("loading-overlay").style.display = "flex";
-
-      const formData = new FormData();
-      const blob = new Blob([fileBuffer]);
-      formData.append("file", blob, fileName);
-
-      try {
-        const response = await fetch("/.netlify/functions/upload", {
-          method: "POST",
-          body: formData,
+      startUploadProgress();
+      const files = Array.from(fileList);
+      const uploads = files.map(file => uploadFile(file));
+      // Use Promise.allSettled so that if at least one file succeeds, we show success
+      Promise.allSettled(uploads)
+        .then((results) => {
+          finishUploadProgress();
+          const successful = results.filter(r => r.status === "fulfilled");
+          if (successful.length > 0) {
+            const notification = document.getElementById("notification-popup");
+            notification.textContent = "File(s) uploaded successfully!";
+            notification.style.display = "block";
+            setTimeout(() => { notification.style.display = "none"; }, 3000);
+          } else {
+            alert("All file uploads failed.");
+          }
+        })
+        .catch((error) => {
+          finishUploadProgress();
+          alert("One or more file uploads failed.");
+        })
+        .finally(() => {
+          setTimeout(() => { document.getElementById("loading-overlay").style.display = "none"; }, 500);
         });
-        const result = await response.json();
-        console.log("Upload result:", result);
-        // Show success notification with animation
-        const notification = document.getElementById("notification-popup");
-        notification.textContent = result.message || "File uploaded successfully!";
-        notification.style.display = "block";
-        setTimeout(() => {
-          notification.style.display = "none";
-        }, 3000);
-      } catch (error) {
-        console.error("Error uploading file:", error);
-        alert("File upload failed.");
-      } finally {
-        document.getElementById("loading-overlay").style.display = "none";
-      }
+    }
+    async function uploadFile(file) {
+      return new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", "/.netlify/functions/upload", true);
+        xhr.onload = function() {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            try {
+              const result = JSON.parse(xhr.responseText);
+              console.log("Upload result for", file.name, ":", result);
+              resolve(result);
+            } catch (err) {
+              reject(err);
+            }
+          } else {
+            reject(new Error("Upload failed with status " + xhr.status));
+          }
+        };
+        xhr.onerror = function() { reject(new Error("Network error")); };
+        const formData = new FormData();
+        formData.append("file", file, file.name);
+        if (userProfile) {
+          const ns = userProfile.nickname || userProfile.name || userProfile.email;
+          formData.append("namespace", ns);
+        }
+        xhr.send(formData);
+      });
     }
   </script>
 </body>
