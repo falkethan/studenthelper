@@ -21,7 +21,7 @@ const openai = new OpenAIApi(new Configuration({ apiKey: OPENAI_API_KEY }));
 const pc = new Pinecone({ apiKey: PINECONE_API_KEY });
 const index = pc.Index(PINECONE_INDEX_NAME);
 
-// Determine namespace from file path
+// Determine namespace from file path if no user namespace is provided
 function determineNamespace(filePath) {
   const baseName = path.basename(filePath, path.extname(filePath)).toLowerCase();
   if (baseName.includes("edec") || baseName.includes("ece")) {
@@ -128,24 +128,35 @@ async function generateVectors(chunks, uniquePrefix) {
   return vectors;
 }
 
-// Function to upsert vectors into Pinecone
-async function upsertVectors(vectors, namespace) {
+// Function to upsert vectors into Pinecone with the provided namespace.
+// The upsert method now takes an array of vectors as the first parameter.
+async function upsertVectors(vectors, namespaceId) {
   if (vectors.length > 0) {
-    const response = await index.upsert(vectors, { namespace });
-    console.log("Upserted vectors response:", response);
+    // Obtain a namespace reference from your index
+    const nsRef = index.namespace(namespaceId);
+    console.log("Using namespace reference:", namespaceId);
+    // Batch the upsert operation (batch size 200; adjust if needed)
+    const batchSize = 200;
+    for (let i = 0; i < vectors.length; i += batchSize) {
+      const batch = vectors.slice(i, i + batchSize);
+      const response = await nsRef.upsert(batch);
+      console.log(`Batch upsert response for records ${i} to ${i + batch.length}:`, response);
+    }
   } else {
     console.log("No vectors to upsert.");
   }
 }
 
-// Main function to ingest file
-async function ingestFile(filePath) {
+
+// Main function to ingest file; now accepts an optional userNamespace
+async function ingestFile(filePath, userNamespace) {
   console.log("Ingesting file:", filePath);
   if (!fs.existsSync(filePath)) {
     throw new Error(`File not found at path: ${filePath}`);
   }
-  const namespace = determineNamespace(filePath);
-  console.log("Determined namespace:", namespace);
+  // Use the provided namespace if available; otherwise determine from the file path.
+  const namespace = userNamespace || determineNamespace(filePath);
+  console.log("Using namespace:", namespace);
   
   const ext = path.extname(filePath).toLowerCase();
   let fullText = "";
@@ -169,6 +180,5 @@ async function ingestFile(filePath) {
   await upsertVectors(vectors, namespace);
 }
 
-// Remove the CLI branch entirely.
-// This module now only exports ingestFile, which is meant to be invoked by your upload function.
+// Export the main function
 export { ingestFile };

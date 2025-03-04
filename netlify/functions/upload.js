@@ -9,11 +9,20 @@ export async function handler(event, context) {
     const busboy = new Busboy({ headers: event.headers });
     let fileBuffer = Buffer.alloc(0);
     let fileName = '';
-    
+    let namespace = ''; // Capture namespace from the form data
+
+    // Capture non-file fields (e.g. namespace)
+    busboy.on('field', (fieldname, val) => {
+      if (fieldname === 'namespace') {
+        namespace = val;
+        console.log("Received namespace:", namespace);
+      }
+    });
+
     busboy.on('file', (fieldname, file, filename, encoding, mimetype) => {
       console.log("Original filename from client:", filename);
-      fileName = filename.split(/[\\/]/).pop(); // This should already do the trick
-      // If there’s still an unwanted prefix, remove it explicitly:
+      fileName = filename.split(/[\\/]/).pop();
+      // Sanitize filename if needed:
       if (fileName.startsWith("test/data/")) {
         fileName = fileName.replace("test/data/", "");
       }
@@ -26,7 +35,6 @@ export async function handler(event, context) {
       });
     });
     
-    
     busboy.on('finish', async () => {
       try {
         const tempFilePath = path.join('/tmp', fileName);
@@ -34,8 +42,9 @@ export async function handler(event, context) {
         fs.writeFileSync(tempFilePath, fileBuffer);
         console.log("File saved to", tempFilePath);
 
-        // Call the ingestion function directly:
-        await ingestFile(tempFilePath);
+        // Pass the namespace to your ingestion function.
+        // In ingestFile, ensure you update the Pinecone upsert call to use this namespace.
+        await ingestFile(tempFilePath, namespace);
         
         resolve({
           statusCode: 200,
