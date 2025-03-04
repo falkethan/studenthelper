@@ -4,7 +4,7 @@ import path from "path";
 import { Configuration, OpenAIApi } from "openai";
 import { queryCoursework } from "./pinecone.js";
 
-// Load scraped finance data
+// Load scraped finance data (if available)
 const financeDataPath = path.join(process.cwd(), "netlify/functions/scraped_finance_data.json");
 let financeData = [];
 if (fs.existsSync(financeDataPath)) {
@@ -19,33 +19,32 @@ export async function handler(event, context) {
       return { statusCode: 405, body: "Method Not Allowed" };
     }
     
-    const { conversation } = JSON.parse(event.body);
+    // Expect the client to send the conversation and the userNamespace.
+    const { conversation, userNamespace } = JSON.parse(event.body);
     
     const configuration = new Configuration({
       apiKey: process.env.OPENAI_API_KEY,
     });
     const openai = new OpenAIApi(configuration);
     
-    // Get the user's latest query
+    // Get the user's latest query.
     const userQuery = conversation[conversation.length - 1].content;
     
-    // Determine the course namespace.
-    // For example, if the first message has a "courseCode" field:
-    const currentCourse = (conversation[0] && conversation[0].courseCode)
-      ? conversation[0].courseCode
-      : (process.env.PINECONE_NAMESPACE || "default");
+    // Use the provided userNamespace or fallback to a default.
+    // (Ensure that the client sends the proper namespace string derived from the user profile.)
+    const currentNamespace = userNamespace || (process.env.PINECONE_NAMESPACE || "default");
+    console.log("Using course namespace:", currentNamespace);
     
-    console.log("Using course namespace:", currentCourse);
-    
-    // Get the embedding for the user's query
+    // Get the embedding for the user's query.
     const embeddingResponse = await openai.createEmbedding({
       model: "text-embedding-ada-002",
       input: userQuery,
     });
     const queryEmbedding = embeddingResponse.data.data[0].embedding;
     
-    // Query Pinecone using the determined namespace
-    const pineconeMatches = await queryCoursework(queryEmbedding, 5, currentCourse);
+    // Query Pinecone using the determined namespace.
+    // (Your updated pinecone.js should bind the namespace using index.namespace(userNamespace))
+    const pineconeMatches = await queryCoursework(queryEmbedding, 5, currentNamespace);
     console.log("🔍 Pinecone Query Results:", pineconeMatches);
     
     const courseworkContext = pineconeMatches.length

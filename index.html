@@ -422,11 +422,11 @@
       }
     };
 
-    // --------- Attach Auth0 event listeners after client is configured -----------
+    // --------- Attach Auth0 event listeners and process redirect callback -----------
     window.onload = async () => {
       await configureClient();
       console.log("Auth0 client configured:", auth0Client);
-      // Enable the login button now that Auth0 is ready.
+      // Enable the login button once Auth0 is ready.
       document.getElementById("login-btn").disabled = false;
       
       // Process redirect callback if present.
@@ -459,7 +459,7 @@
     const sendBtn = document.getElementById('send');
     const API_URL = window.location.hostname === "localhost"
       ? "http://localhost:8888/.netlify/functions/ask"
-      : "https://financeaibot.netlify.app/.netlify/functions/ask";
+      : "https://financeaibot.netlify/functions/ask";
 
     function addMessage(text, sender) {
       const msgDiv = document.createElement('div');
@@ -540,10 +540,12 @@
       promptEl.value = '';
       startProgress();
       try {
+        // Determine user namespace from userProfile if available, otherwise default to "default"
+        const ns = userProfile ? (userProfile.nickname || userProfile.name || userProfile.email) : "default";
         const response = await fetch(API_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ conversation: conversation })
+          body: JSON.stringify({ conversation: conversation, userNamespace: ns })
         });
         const data = await response.json();
         if (data.response) {
