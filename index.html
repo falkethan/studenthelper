@@ -67,6 +67,24 @@
       vertical-align: middle;
       margin-right: 5px;
     }
+    /* NEW: File list container styling */
+    #file-list {
+      margin-top: 15px;
+      text-align: left;
+    }
+    #file-list ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    #file-list li {
+      margin-bottom: 5px;
+      font-size: 14px;
+      color: #ddd;
+    }
+    #file-list li span.file-icon {
+      margin-right: 5px;
+    }
     #uploadBtn {
       margin-top: 15px;
       padding: 10px 20px;
@@ -294,6 +312,8 @@
             <li class="list-inline-item"><img src="assets/pptx-logo.png" alt="PPTX"> .pptx</li>
           </ul>
         </div>
+        <!-- NEW: File list container -->
+        <div id="file-list"></div>
       </div>
 
       <!-- Center Column: Chat Section -->
@@ -588,12 +608,14 @@
       dropZone.classList.remove("hover");
       const droppedFiles = e.dataTransfer.files;
       if (droppedFiles.length) {
+        updateFileList(Array.from(droppedFiles));
         handleFileUploads(droppedFiles);
       }
     });
     fileInput.addEventListener("change", (e) => {
       const selectedFiles = e.target.files;
       if (selectedFiles.length) {
+        updateFileList(Array.from(selectedFiles));
         handleFileUploads(selectedFiles);
       }
     });
@@ -673,6 +695,18 @@
         }
         xhr.send(formData);
       });
+    }
+    
+    // NEW: Function to update the file list UI in the drop zone
+    function updateFileList(files) {
+      const fileListContainer = document.getElementById("file-list");
+      if (!fileListContainer) return;
+      let html = "<ul class='list-group'>";
+      files.forEach(file => {
+        html += `<li class="list-group-item bg-dark text-white"><span class="file-icon">📄</span>${file.name}</li>`;
+      });
+      html += "</ul>";
+      fileListContainer.innerHTML = html;
     }
   </script>
 </body>
