@@ -47,9 +47,10 @@ export async function handler(event, context) {
     const pineconeMatches = await queryCoursework(queryEmbedding, 5, currentNamespace);
     console.log("🔍 Pinecone Query Results:", pineconeMatches);
     
+    // If there are matches, include the coursework; otherwise, ask for clarification.
     const courseworkContext = pineconeMatches.length
       ? `\n\nRelevant coursework found:\n${pineconeMatches.map(match => `- ${match.metadata.text}`).join("\n")}`
-      : "";
+      : "\n\n[Note: Coursework data is still loading. Please specify which course you are referring to.]";
     
     const messages = [
       {

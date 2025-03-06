@@ -2,12 +2,12 @@
 <html lang="en">
 <head>
   <meta http-equiv="Content-Security-Policy" content="
-  default-src 'self';
-  script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.auth0.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;
-  style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com;
-  connect-src 'self' https://dev-6l3jcnaf0wzmpdc2.us.auth0.com;
-  font-src 'self' https://fonts.gstatic.com;
-">
+    default-src 'self';
+    script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.auth0.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;
+    style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com;
+    connect-src 'self' https://dev-6l3jcnaf0wzmpdc2.us.auth0.com;
+    font-src 'self' https://fonts.gstatic.com;
+  ">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Bloo - Your Personal Education AI</title>
@@ -296,11 +296,22 @@
     <button id="logout-btn" class="btn btn-secondary" style="display:none;">Logout</button>
   </div>
 
-  <!-- Bloobot Main UI -->
-  <div class="container">
-    <div class="main-container">
-      <!-- Left Column: File Upload Section -->
-      <div id="drop-zone" class="dropzone-container">
+  <!-- Page 1: Welcome Screen -->
+  <div id="page-welcome" class="page" style="display:none;">
+    <div class="container text-center" style="margin-top: 100px;">
+      <!-- NEW: Logo placeholder -->
+      <img src="assets/logo.png" alt="Logo" style="max-width:200px; margin-bottom:20px;">
+      <h1>Welcome to Bloo</h1>
+      <p>Please sign in or create an account to continue.</p>
+      <button id="welcome-login-btn" class="btn btn-primary">Sign In / Create Account</button>
+    </div>
+  </div>
+
+  <!-- Page 2: Upload Screen -->
+  <div id="page-upload" class="page" style="display:none;">
+    <div class="container text-center">
+      <!-- File Upload Section -->
+      <div id="drop-zone" class="dropzone-container mx-auto">
         <p>Drag & drop your file here<br>or click to select</p>
         <input type="file" id="fileUpload" accept=".pdf,.pptx,.docx" multiple style="display: none;">
         <button id="uploadBtn" class="btn">Upload File</button>
@@ -312,44 +323,56 @@
             <li class="list-inline-item"><img src="assets/pptx-logo.png" alt="PPTX"> .pptx</li>
           </ul>
         </div>
-        <!-- NEW: File list container -->
+        <!-- File list container -->
         <div id="file-list"></div>
       </div>
+      <!-- NEW: Skip to Chat button placed outside the drop zone -->
+      <button id="skip-btn" class="btn btn-secondary mt-3">Skip to Chat</button>
+    </div>
+  </div>
 
-      <!-- Center Column: Chat Section -->
-      <div class="chat-container">
-        <div class="chat-header">
-          <img src="assets/bloobotlogoimage.png" alt="Bloo Profile Picture">
-          <h2>Bloo</h2>
+  <!-- Page 3: Chat Screen -->
+  <div id="page-chat" class="page" style="display:none;">
+    <div class="container">
+      <div class="main-container">
+        <!-- Chat Section -->
+        <div class="chat-container">
+          <div class="chat-header">
+            <img src="assets/bloobotlogoimage.png" alt="Bloo Profile Picture">
+            <h2>Bloo</h2>
+          </div>
+          <div class="messages mb-3" id="messages"></div>
+          <div id="progressContainer">
+            <div id="progressBar"></div>
+          </div>
+          <div id="preset-prompts" class="mb-3">
+            <button class="btn preset-btn" data-prompt="I need help with my homework">Help with homework</button>
+            <button class="btn preset-btn" data-prompt="I want you to summarize this reading for my class">Summarize reading</button>
+            <button class="btn preset-btn" data-prompt="What can you help me with?">More</button>
+          </div>
+          <div class="input-group mb-3">
+            <textarea id="prompt" class="form-control" placeholder="Hey, I'm Bloo. What class can I help you with?" rows="1" style="resize: none;"></textarea>
+            <button id="send" class="btn">&#8594;</button>
+          </div>
+          <!-- Upload More Files Button -->
+          <div style="margin-top: 20px; text-align: center;">
+            <button id="back-to-upload-btn" class="btn btn-secondary">Upload More Files</button>
+          </div>
         </div>
-        <div class="messages mb-3" id="messages"></div>
-        <div id="progressContainer">
-          <div id="progressBar"></div>
-        </div>
-        <div id="preset-prompts" class="mb-3">
-          <button class="btn preset-btn" data-prompt="I need help with my homework">Help with homework</button>
-          <button class="btn preset-btn" data-prompt="I want you to summarize this reading for my class">Summarize reading</button>
-          <button class="btn preset-btn" data-prompt="What can you help me with?">More</button>
-        </div>
-        <div class="input-group mb-3">
-          <textarea id="prompt" class="form-control" placeholder="Hey, I'm Bloo. What class can I help you with?" rows="1" style="resize: none;"></textarea>
-          <button id="send" class="btn">&#8594;</button>
-        </div>
-      </div>
-
-      <!-- Right Column: Information Panel -->
-      <div class="info-container">
-        <h3>What Bloo Can Do</h3>
-        <ul>
-          <li>Analyze your coursework files</li>
-          <li>Break down homework & assignments</li>
-          <li>Provide step-by-step guidance</li>
-          <li>Customize responses (coursework-specific or general)</li>
-          <li>Promote deeper learning through interactive explanations</li>
-        </ul>
-        <div class="slider-prototype mt-4">
-          <input type="range" min="0" max="100" value="50" style="width: 100%;">
-          <small class="d-block mt-1 text-muted">This is a prototype. This does not work yet.</small>
+        <!-- Information Panel -->
+        <div class="info-container">
+          <h3>What Bloo Can Do</h3>
+          <ul>
+            <li>Analyze your coursework files</li>
+            <li>Break down homework & assignments</li>
+            <li>Provide step-by-step guidance</li>
+            <li>Customize responses (coursework-specific or general)</li>
+            <li>Promote deeper learning through interactive explanations</li>
+          </ul>
+          <div class="slider-prototype mt-4">
+            <input type="range" min="0" max="100" value="50" style="width: 100%;">
+            <small class="d-block mt-1 text-muted">This is a prototype. This does not work yet.</small>
+          </div>
         </div>
       </div>
     </div>
@@ -373,6 +396,12 @@
   <script src="https://cdn.auth0.com/js/auth0-spa-js/2.0/auth0-spa-js.production.js"></script>
   <!-- Combined Auth0 and Bloobot logic -->
   <script>
+    // --------- Utility: Simple Router -----------
+    function showPage(pageId) {
+      document.querySelectorAll('.page').forEach(page => page.style.display = 'none');
+      document.getElementById(pageId).style.display = 'block';
+    }
+
     // --------- Auth0 Integration -----------
     let auth0Client = null;
     let userProfile = null;
@@ -417,6 +446,7 @@
           logoutParams: { returnTo: window.location.origin }
         });
         updateAuthUI();
+        showPage("page-welcome");
       } catch (err) {
         console.log("Log out failed", err);
       }
@@ -460,9 +490,23 @@
           console.log("Error parsing redirect:", err);
         }
       }
-      updateAuthUI();
+      await updateAuthUI();
+      // Show page based on auth state.
+      const isAuthenticated = await auth0Client.isAuthenticated();
+      if (isAuthenticated) {
+        showPage("page-upload");
+      } else {
+        showPage("page-welcome");
+      }
     };
 
+    // Event listener for welcome page login button.
+    document.getElementById("welcome-login-btn").addEventListener("click", () => {
+      console.log("Welcome login button clicked");
+      login();
+    });
+
+    // Standard Auth0 buttons.
     document.getElementById("login-btn").addEventListener("click", () => {
       console.log("Login button clicked");
       login();
@@ -470,6 +514,16 @@
 
     document.getElementById("logout-btn").addEventListener("click", () => {
       logout();
+    });
+
+    // --------- Skip Button on Upload Page -----------
+    document.getElementById("skip-btn").addEventListener("click", () => {
+      showPage("page-chat");
+    });
+
+    // --------- Upload More Files Button on Chat Page -----------
+    document.getElementById("back-to-upload-btn").addEventListener("click", () => {
+      showPage("page-upload");
     });
 
     // --------- Bloobot Chat and File Upload Logic -----------
@@ -709,5 +763,13 @@
       fileListContainer.innerHTML = html;
     }
   </script>
+  
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      // Assuming addMessage is defined and available in your scope.
+      addMessage("Hey there! What homework can I help you with today?", "bot");
+    });
+  </script>
+  
 </body>
 </html>
