@@ -66,7 +66,6 @@
       width: 100%;
       height: 100%;
       opacity: 0;
-      /* Prevent the input from capturing drag events */
       pointer-events: none;
     }
     .supported-formats {
@@ -323,22 +322,22 @@
     <button id="logout-btn" class="btn btn-secondary" style="display:none;">Logout</button>
   </div>
 
- <!-- Page 1: Welcome Screen (Modernized) -->
-<div id="page-welcome" class="page">
-  <div class="container d-flex align-items-center justify-content-center" style="min-height: 100vh;">
-    <div class="card p-4 shadow" style="max-width: 400px; width: 100%;">
-      <div class="text-center mb-4">
-        <img src="assets/bloobotlogoofficialblacktext.png" alt="Logo" style="max-width:150px;">
-      </div>
-      <h1 class="h3 text-center mb-3">Welcome to Bloo</h1>
-      <p class="text-center text-muted mb-4">Sign in or create an account to continue</p>
-      <div class="d-grid gap-2">
-        <button id="sign-in-btn" class="btn btn-primary">Sign In</button>
-        <button id="create-account-btn" class="btn btn-outline-secondary">Create Account</button>
+  <!-- Page 1: Welcome Screen (Modernized) -->
+  <div id="page-welcome" class="page">
+    <div class="container d-flex align-items-center justify-content-center" style="min-height: 100vh;">
+      <div class="card p-4 shadow" style="max-width: 400px; width: 100%;">
+        <div class="text-center mb-4">
+          <img src="assets/bloobotlogoofficialblacktext.png" alt="Logo" style="max-width:150px;">
+        </div>
+        <h1 class="h3 text-center mb-3">Welcome to Bloo</h1>
+        <p class="text-center text-muted mb-4">Sign in or create an account to continue</p>
+        <div class="d-grid gap-2">
+          <button id="sign-in-btn" class="btn btn-primary">Sign In</button>
+          <button id="create-account-btn" class="btn btn-outline-secondary">Create Account</button>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
   <!-- Page 2: Upload Screen -->
   <div id="page-upload" class="page">
@@ -611,12 +610,28 @@
       messagesEl.scrollTop = messagesEl.scrollHeight;
     }
 
+    // Enhanced markdown parser: converts headings, bold, italic and bullet lists
     function markdownToHTML(markdown) {
-      let output = markdown;
-      output = output.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-      output = output.replace(/\*(.+?)\*/g, '<em>$1</em>');
-      return output;
-    }
+  let output = markdown;
+  // Convert headings
+  output = output.replace(/^###### (.*)$/gm, '<h6>$1</h6>');
+  output = output.replace(/^##### (.*)$/gm, '<h5>$1</h5>');
+  output = output.replace(/^#### (.*)$/gm, '<h4>$1</h4>');
+  output = output.replace(/^### (.*)$/gm, '<h3>$1</h3>');
+  output = output.replace(/^## (.*)$/gm, '<h2>$1</h2>');
+  output = output.replace(/^# (.*)$/gm, '<h1>$1</h1>');
+  // Bold and italic
+  output = output.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  output = output.replace(/\*(.+?)\*/g, '<em>$1</em>');
+  // Unordered list items: lines starting with -, +, or *
+  output = output.replace(/(?:^|\n)[-+*]\s+(.*)/g, '\n<li>$1</li>');
+  // Ordered list items: lines starting with a number and a period
+  output = output.replace(/(?:^|\n)\d+\.\s+(.*)/g, '\n<li>$1</li>');
+  // Wrap contiguous <li> blocks in an unordered list
+  output = output.replace(/((?:<li>.*<\/li>\n?)+)/g, '<ul>$1</ul>');
+  return output;
+}
+
 
     function intoPieces(text) {
       if (/^\s*$/.test(text)) return [text];
