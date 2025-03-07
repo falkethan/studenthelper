@@ -23,6 +23,7 @@
       color: #212529;
       font-family: 'Roboto', sans-serif;
       padding: 20px;
+      margin: 0; /* remove default margin for a flush hero section */
     }
     .page {
       display: none;
@@ -58,7 +59,6 @@
       margin: 0 0 15px;
       font-size: 16px;
     }
-    /* The file input now covers the dropzone but does not intercept pointer events */
     .dropzone-container input[type="file"] {
       position: absolute;
       top: 0;
@@ -323,9 +323,65 @@
       textarea.form-control { padding-right: 50px; }
       #send { width: 35px; height: 35px; font-size: 1rem; }
     }
-    #page-welcome {
-      background: url('assets/website-background-2.png') no-repeat center center;
-      background-size: cover;
+
+    /* 
+      -----------------------------------------
+      NEW LANDING PAGE SECTIONS (Funnel Layout)
+      -----------------------------------------
+    */
+    /* Page-Landing: Hero, Features, CTA */
+    #page-landing {
+      /* We'll make it the top-level funnel page if user is not authenticated */
+      min-height: 100vh;
+      display: none; /* hidden by default, revealed in script */
+      pointer-events: auto;
+    }
+    .hero-section {
+      background: #ffffff;
+      padding: 80px 20px;
+      text-align: center;
+    }
+    .hero-section h1 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      font-weight: 600;
+    }
+    .hero-section p.lead {
+      font-size: 1.25rem;
+      margin-bottom: 1.5rem;
+      max-width: 600px;
+      margin: 0 auto 1.5rem auto;
+    }
+    .hero-section img {
+      max-width: 200px;
+      margin-bottom: 20px;
+    }
+    .features-section {
+      background: #ffffff;
+      padding: 60px 20px;
+    }
+    .features-section h3 {
+      font-weight: 500;
+      margin-top: 1rem;
+      margin-bottom: 1rem;
+    }
+    .features-section p {
+      font-size: 1rem;
+      color: #6c757d;
+    }
+    .cta-section {
+      background: #007bff;
+      color: #ffffff;
+      text-align: center;
+      padding: 50px 20px;
+    }
+    .cta-section h2 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+    .cta-section p {
+      font-size: 1.25rem;
+      margin-bottom: 1.5rem;
     }
   </style>
 </head>
@@ -336,8 +392,79 @@
     <button id="logout-btn" class="btn btn-secondary" style="display:none;">Logout</button>
   </div>
 
-<!-- Page 1: Welcome Screen (Two-Column Layout) -->
-<div id="page-welcome" class="page" style="min-height: 100vh; background: url('assets/website-background-2.png') no-repeat center center; background-size: cover;">
+ <!-- ========================================= -->
+<!-- PAGE 0: Landing Page (Funnel Layout) -->
+<!-- ========================================= -->
+<div id="page-landing" class="page" style="min-height: 100vh; background: url('/assets/website-background-2.png') no-repeat center center; background-size: cover;">
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="container">
+      <img src="assets/bloobotlogoofficialblacktext.png" alt="Bloobot Logo" />
+      <h1>Your AI-Powered Homework Helper</h1>
+      <p class="lead">
+        Transform the way you complete assignments with Bloobot’s AI-driven insights,
+        personalized coursework analysis, and step-by-step homework guidance.
+      </p>
+      <!-- "Get Started" => leads to page-welcome or page-info -->
+      <button id="landing-get-started-btn" class="btn btn-primary btn-lg">Get Started</button>
+    </div>
+  </section>
+  <!-- Features Section -->
+  <section class="features-section">
+    <div class="container">
+      <div class="row text-center">
+        <div class="col-md-4 mb-4">
+          <img src="assets/files-icon.png" alt="Analyze Files" style="width:60px;" />
+          <h3>Analyze Your Files</h3>
+          <p>
+            Bloobot quickly ingests your PDFs, Word docs, PowerPoints, and Excel files
+            to provide coursework specific answers and deeper insights into your coursework.
+          </p>
+        </div>
+        <div class="col-md-4 mb-4">
+          <img src="assets/homework-icon.png" alt="Homework Guidance" style="width:60px;" />
+          <h3>Homework Guidance</h3>
+          <p>
+            Struggling with assignments? Let Bloobot break down complex tasks into
+            simpler steps and walk you through each stage for better understanding.
+          </p>
+        </div>
+        <div class="col-md-4 mb-4">
+          <img src="assets/study-tips-icon.png" alt="Study Tips" style="width:60px;" />
+          <h3>Study Tips &amp; More</h3>
+          <p>
+            From interactive Q&amp;A to personalized study recommendations, Bloobot
+            helps you focus on the topics that matter most.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- CTA Section -->
+  <section class="cta-section" style="cursor: pointer; transition: transform 0.3s ease, box-shadow 0.3s ease; border-radius: 12px;">
+    <div class="container">
+      <h2>Ready to Ace Your Classes?</h2>
+      <p>
+        Join hundreds of students who trust Bloobot to simplify coursework and maximize learning efficiency.
+      </p>
+      <!-- "Sign Up for Free" => triggers login or create account -->
+      <button id="landing-signup-btn" class="btn btn-light btn-lg">Sign Up for Free</button>
+    </div>
+  </section>
+</div>
+
+<!-- New CSS for hover effect on CTA Section -->
+<style>
+  .cta-section:hover {
+    transform: scale(1.02);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  }
+</style>
+
+  <!-- END of PAGE 0: Landing Page -->
+
+  <!-- Page 1: Welcome Screen (Two-Column Layout) -->
+<div id="page-welcome" class="page" style="min-height: 100vh; background: url('/assets/website-background-2.png') no-repeat center center; background-size: cover;">
   <div class="container py-5">
     <div class="row align-items-center">
       <!-- Left Column: Info Box -->
@@ -382,8 +509,8 @@
           <h1 class="h3 text-center mb-3" style="color: #212529;">Welcome to Bloo</h1>
           <p class="text-center text-muted mb-4">Sign in or create an account to continue</p>
           <div class="d-grid gap-2">
-            <button id="sign-in-btn" class="btn btn-primary">Sign In</button>
-            <button id="create-account-btn" class="btn btn-outline-secondary">Create Account</button>
+            <button id="sign-in-btn" class="btn btn-primary btn-modern">Sign In</button>
+            <button id="create-account-btn" class="btn btn-outline-secondary btn-modern">Create Account</button>
           </div>
         </div>
       </div>
@@ -391,40 +518,88 @@
   </div>
 </div>
 
-  <!-- New Page: Info about Bloo -->
+<!-- New CSS for modern buttons -->
+<style>
+  .btn-modern {
+    border-radius: 25px;
+    font-weight: 500;
+    padding: 12px 24px;
+    transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  .btn-modern:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+  }
+</style>
+
+
+<!-- New Page: Next Steps for Bloo -->
 <div id="page-info" class="page">
   <div class="container">
+    <!-- Modern Back Button -->
+    <div class="mb-4">
+      <button id="back-to-landing-btn" class="btn btn-outline-primary btn-modern-back">
+        &larr; Back to Home
+      </button>
+    </div>
+    <!-- Next Steps Card -->
     <div class="card p-5 shadow mb-4 mx-auto" style="max-width: 600px;">
       <div class="card-body text-center">
-        <h2 class="card-title mb-3">Discover Bloo</h2>
-        <p class="card-text">
-          Bloo is your dedicated personal education AI, engineered to provide coursework‑specific insights that go far beyond generic responses. While other AIs like ChatGPT offer broad knowledge, Bloo dives deep into your course documents and assignments to deliver answers and guidance tailored precisely to your curriculum.
+        <h2 class="card-title mb-4">What to Do Next</h2>
+        <p class="card-text mb-4">
+          With Bloo, you can quickly get personalized answers based on your coursework. Choose your next step below:
         </p>
-        <ul class="list-group list-group-flush mb-3 text-start">
-          <li class="list-group-item">🔍 <strong>Curriculum‑Focused:</strong> Responses based on your own course materials.</li>
-          <li class="list-group-item">🎯 <strong>Targeted Guidance:</strong> Step‑by‑step support for complex assignments.</li>
-          <li class="list-group-item">🚀 <strong>Enhanced Learning:</strong> Personalized insights that boost academic success.</li>
+        <ul class="list-group list-group-flush mb-4 text-start">
+          <li class="list-group-item">
+            <strong>Upload Your Files:</strong> Let Bloo analyze your course materials to generate tailored insights.
+          </li>
+          <li class="list-group-item">
+            <strong>Chat with Bloo:</strong> Skip file uploads and start a conversation for instant help.
+          </li>
         </ul>
-        <p class="card-text">
-          Experience the difference of an AI built exclusively for your educational needs. Start by uploading your files or jump directly into a chat with Bloo.
-        </p>
       </div>
     </div>
+    <!-- Action Buttons -->
     <div class="d-flex justify-content-center gap-3">
-      <button id="upload-files-btn" class="btn btn-primary">Upload Files</button>
-      <button id="skip-to-bloo-btn" class="btn btn-secondary">Skip to Bloo</button>
+      <button id="upload-files-btn" class="btn btn-primary btn-lg">Upload Files</button>
+      <button id="skip-to-bloo-btn" class="btn btn-secondary btn-lg">Chat with Bloo</button>
     </div>
   </div>
 </div>
 
+<!-- New CSS for modern back button (if not already defined) -->
+<style>
+  .btn-modern-back {
+    border-radius: 25px;
+    font-weight: 500;
+    padding: 10px 20px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  .btn-modern-back:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+  }
+</style>
 
+<!-- New CSS for modern back button -->
+<style>
+  .btn-modern-back {
+    border-radius: 25px;
+    font-weight: 500;
+    padding: 10px 20px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  .btn-modern-back:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+  }
+</style>
 
-
- <!-- Page 2: Upload Screen -->
+ <!-- Page 2: Upload Screen --> 
 <div id="page-upload" class="page">
   <div class="container text-center position-relative">
-    <!-- Back button positioned in the top left -->
-    <button id="back-to-info-btn" class="btn btn-link position-absolute start-0 top-0 m-3">&larr; Back</button>
+    <!-- Modern Back Button positioned in the top left -->
+    <button id="back-to-info-btn" class="btn btn-outline-primary btn-modern-back position-absolute start-0 top-0 m-3">&larr; Back</button>
     <div id="drop-zone" class="dropzone-container mx-auto">
       <!-- Modernized Upload UI: Inline SVG Icon -->
       <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="#007bff" class="bi bi-cloud-upload" viewBox="0 0 16 16">
@@ -543,13 +718,16 @@
     function showPage(pageId) {
       $('.page').hide();
       $('#' + pageId).fadeIn(300, function() {
-          $(this).css("pointer-events", "auto");
+        $(this).css("pointer-events", "auto");
       });
     }
+
     // --------- Auth0 Integration -----------
     let auth0Client = null;
     let userProfile = null;
+
     const fetchAuthConfig = () => fetch("/auth_config.json");
+
     const configureClient = async () => {
       try {
         const response = await fetchAuthConfig();
@@ -564,6 +742,7 @@
         console.log("Error configuring Auth0 client:", err);
       }
     };
+
     const login = async (targetUrl) => {
       try {
         const options = {
@@ -578,6 +757,7 @@
         console.log("Log in failed", err);
       }
     };
+
     const logout = async () => {
       try {
         await auth0Client.logout({
@@ -589,6 +769,7 @@
         console.log("Log out failed", err);
       }
     };
+
     const updateAuthUI = async () => {
       try {
         const isAuthenticated = await auth0Client.isAuthenticated();
@@ -606,10 +787,12 @@
         console.log("Error updating UI!", err);
       }
     };
+
     // --------- Attach Auth0 event listeners and process redirect callback -----------
     window.onload = async () => {
       await configureClient();
       document.getElementById("login-btn").disabled = false;
+
       if (window.location.search.includes("code=") && window.location.search.includes("state=")) {
         try {
           await auth0Client.handleRedirectCallback();
@@ -621,16 +804,32 @@
         }
       }
       await updateAuthUI();
+
       const isAuthenticated = await auth0Client.isAuthenticated();
+      // If user is authenticated, show page-info, else show page-landing
       if (isAuthenticated) {
         showPage("page-info");
       } else {
-        showPage("page-welcome");
+        showPage("page-landing");
       }
-      // Attach event listeners for auth buttons
-      document.getElementById("back-to-info-btn").addEventListener("click", () => {
-  showPage("page-info");
+
+      document.getElementById("back-to-landing-btn").addEventListener("click", () => {
+  showPage("page-landing");
 });
+      // Attach event listeners for auth buttons
+      document.getElementById("landing-get-started-btn").addEventListener("click", () => {
+        // For example, go to the welcome screen
+        showPage("page-welcome");
+      });
+      document.getElementById("landing-signup-btn").addEventListener("click", () => {
+        // Trigger sign up flow
+        login();
+      });
+
+      document.getElementById("back-to-info-btn").addEventListener("click", () => {
+        showPage("page-info");
+      });
+
       document.getElementById("sign-in-btn").addEventListener("click", () => {
         console.log("Sign In clicked");
         login();
@@ -646,6 +845,7 @@
       document.getElementById("logout-btn").addEventListener("click", () => {
         logout();
       });
+
       // New Info Page Buttons
       document.getElementById("upload-files-btn").addEventListener("click", () => {
         showPage("page-upload");
@@ -653,21 +853,26 @@
       document.getElementById("skip-to-bloo-btn").addEventListener("click", () => {
         showPage("page-chat");
       });
+
       // Attach event listener for "Chat with Bloo" button on the Upload Page
       document.getElementById("chat-btn").addEventListener("click", () => {
         showPage("page-chat");
       });
     };
+
     document.getElementById("skip-btn").addEventListener("click", () => {
       showPage("page-chat");
     });
+
     document.getElementById("back-to-upload-btn").addEventListener("click", () => {
       showPage("page-upload");
     });
+
     document.getElementById('prompt').addEventListener('input', function() {
       this.style.height = 'auto';
       this.style.height = this.scrollHeight + 'px';
     });
+
     let conversation = [];
     const messagesEl = document.getElementById('messages');
     const promptEl = document.getElementById('prompt');
@@ -675,6 +880,7 @@
     const API_URL = window.location.hostname === "localhost"
       ? "http://localhost:8888/.netlify/functions/ask"
       : "/.netlify/functions/ask";
+
     function addMessage(text, sender) {
       const msgDiv = document.createElement('div');
       msgDiv.className = 'message ' + sender + ' mb-2';
@@ -686,6 +892,7 @@
       messagesEl.appendChild(msgDiv);
       messagesEl.scrollTop = messagesEl.scrollHeight;
     }
+
     // Enhanced markdown parser: converts headings, bold, italic and bullet lists
     function markdownToHTML(markdown) {
       let output = markdown;
@@ -707,11 +914,13 @@
       output = output.replace(/((?:<li>.*<\/li>\n?)+)/g, '<ul>$1</ul>');
       return output;
     }
+
     function intoPieces(text) {
       if (/^\s*$/.test(text)) return [text];
       const pieces = text.match(/(\s*\S+\s*)/g);
       return pieces || [];
     }
+
     function typeWriter(text, element, speed = 30) {
       let i = 0;
       const interval = setInterval(() => {
@@ -720,6 +929,7 @@
         if (i > text.length) clearInterval(interval);
       }, speed);
     }
+
     function addBotMessageWithFormattingAndTyping(text, wpm) {
       const msgDiv = document.createElement('div');
       msgDiv.className = 'message bot mb-2';
@@ -736,6 +946,7 @@
         if (expectedCount >= pieces.length) clearInterval(interval);
       }, 200);
     }
+
     let progressInterval;
     function startProgress() {
       const progressContainer = document.getElementById('progressContainer');
@@ -758,6 +969,7 @@
       clearInterval(progressInterval);
       setTimeout(() => { document.getElementById('progressContainer').style.display = 'none'; }, 500);
     }
+
     sendBtn.addEventListener('click', async () => {
       const promptText = promptEl.value.trim();
       if (!promptText) return;
@@ -786,20 +998,24 @@
         finishProgress();
       }
     });
+
     promptEl.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
         sendBtn.click();
       }
     });
+
     document.querySelectorAll('.preset-btn').forEach(button => {
       button.addEventListener('click', () => {
         promptEl.value = button.getAttribute('data-prompt');
         sendBtn.click();
       });
     });
+
     const dropZone = document.getElementById("drop-zone");
     const fileInput = document.getElementById("fileUpload");
+
     dropZone.addEventListener("click", () => { fileInput.click(); });
     dropZone.addEventListener("dragover", (e) => { e.preventDefault(); dropZone.classList.add("hover"); });
     dropZone.addEventListener("dragleave", (e) => { e.preventDefault(); dropZone.classList.remove("hover"); });
@@ -812,6 +1028,7 @@
         handleFileUploads(droppedFiles);
       }
     });
+
     fileInput.addEventListener("change", (e) => {
       const selectedFiles = e.target.files;
       if (selectedFiles.length) {
@@ -821,6 +1038,7 @@
         fileInput.value = "";
       }
     });
+
     let uploadProgressInterval;
     function startUploadProgress() {
       const container = document.getElementById("upload-progress-container");
