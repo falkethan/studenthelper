@@ -23,7 +23,8 @@
     "openai": "^3.3.0",
     "pdf-parse": "^1.1.1",
     "pptx-parser": "^1.1.7-beta.9",
-    "pptx2json": "^0.0.10"
+    "pptx2json": "^0.0.10",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "netlify-cli": "^18.1.0"

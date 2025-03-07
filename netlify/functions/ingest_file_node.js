@@ -5,6 +5,7 @@ import pdfParse from "pdf-parse";
 import mammoth from "mammoth";
 import PPTX2Json from "pptx2json"; // imported as a class
 import officeParser from "officeparser"; // fallback for PPTX extraction
+import XLSX from "xlsx"; // NEW: For parsing Excel files
 import { Configuration, OpenAIApi } from "openai";
 import { Pinecone } from "@pinecone-database/pinecone";
 import dotenv from "dotenv";
@@ -94,6 +95,24 @@ async function extractTextFromPPTX(filePath) {
   return text;
 }
 
+// NEW: Extraction function for Excel files (.xlsx and .xls)
+async function extractTextFromExcel(filePath) {
+  console.log(`Extracting text from Excel: ${filePath}`);
+  const dataBuffer = fs.readFileSync(filePath);
+  // Read the workbook from the file buffer
+  const workbook = XLSX.read(dataBuffer, { type: "buffer" });
+  let fullText = "";
+  // Iterate through each sheet and convert it to CSV text
+  workbook.SheetNames.forEach(sheetName => {
+    const worksheet = workbook.Sheets[sheetName];
+    const sheetText = XLSX.utils.sheet_to_csv(worksheet);
+    fullText += sheetText + "\n";
+  });
+  console.log("Extracted Excel text length:", fullText.length);
+  console.log("Extracted Excel text preview:", fullText.slice(0, 200));
+  return fullText;
+}
+
 // Simple chunking function – adjust as needed
 function chunkText(fullText) {
   const chunks = fullText
@@ -129,13 +148,10 @@ async function generateVectors(chunks, uniquePrefix) {
 }
 
 // Function to upsert vectors into Pinecone with the provided namespace.
-// The upsert method now takes an array of vectors as the first parameter.
 async function upsertVectors(vectors, namespaceId) {
   if (vectors.length > 0) {
-    // Obtain a namespace reference from your index
     const nsRef = index.namespace(namespaceId);
     console.log("Using namespace reference:", namespaceId);
-    // Batch the upsert operation (batch size 200; adjust if needed)
     const batchSize = 200;
     for (let i = 0; i < vectors.length; i += batchSize) {
       const batch = vectors.slice(i, i + batchSize);
@@ -146,7 +162,6 @@ async function upsertVectors(vectors, namespaceId) {
     console.log("No vectors to upsert.");
   }
 }
-
 
 // Main function to ingest file; now accepts an optional userNamespace
 async function ingestFile(filePath, userNamespace) {
@@ -170,6 +185,8 @@ async function ingestFile(filePath, userNamespace) {
     console.log("Extracted DOCX text length:", fullText.length);
   } else if (ext === ".pptx") {
     fullText = await extractTextFromPPTX(filePath);
+  } else if (ext === ".xlsx" || ext === ".xls") {
+    fullText = await extractTextFromExcel(filePath);
   } else {
     throw new Error("Unsupported file type: " + ext);
   }
