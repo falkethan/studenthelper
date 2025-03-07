@@ -33,6 +33,7 @@
       gap: 20px;
       align-items: flex-start;
     }
+    /* Modernized Dropzone Styles */
     .dropzone-container {
       flex: 1;
       max-width: 300px;
@@ -40,16 +41,34 @@
       background: #ffffff;
       border: 2px dashed #007bff;
       border-radius: 8px;
-      padding: 20px;
+      padding: 40px 20px;
       text-align: center;
       color: #495057;
       transition: background 0.3s ease;
       cursor: pointer;
+      position: relative;
     }
-    .dropzone-container.hover {
+    .dropzone-container:hover {
       background: #e9ecef;
     }
-    .dropzone-container p { margin: 0; }
+    .dropzone-container svg {
+      margin-bottom: 15px;
+    }
+    .dropzone-container p {
+      margin: 0 0 15px;
+      font-size: 16px;
+    }
+    /* The file input now covers the dropzone but does not intercept pointer events */
+    .dropzone-container input[type="file"] {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      /* Prevent the input from capturing drag events */
+      pointer-events: none;
+    }
     .supported-formats {
       margin-top: 15px;
       font-size: 14px;
@@ -89,17 +108,7 @@
     #file-list li span.file-icon {
       margin-right: 5px;
     }
-    #uploadBtn {
-      margin-top: 15px;
-      padding: 10px 20px;
-      background-color: #28a745;
-      color: #fff;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-    #uploadBtn:hover { background-color: #218838; }
+    /* Chat Container */
     .chat-container {
       flex: 2;
       background: #ffffff;
@@ -140,7 +149,6 @@
       background: #e9ecef;
       color: #212529;
     }
-    /* Updated Bot Message Styling */
     .message.bot {
       background: #cce5ff;
       color: #004085;
@@ -155,7 +163,7 @@
       width: 100%;
       padding-right: 50px; /* make space for the arrow button */
     }
-    /* New container for chat input with arrow inside */
+    /* Chat input with arrow inside */
     .chat-input-container {
       position: relative;
       margin-bottom: 1rem;
@@ -176,7 +184,7 @@
       transition: background 0.3s ease;
     }
     #send:hover { background: #0056b3; }
-    /* Preset prompts removed as requested */
+    /* Info Container */
     .info-container {
       flex: 1;
       max-width: 300px;
@@ -315,25 +323,34 @@
     <button id="logout-btn" class="btn btn-secondary" style="display:none;">Logout</button>
   </div>
 
-  <!-- Page 1: Welcome Screen -->
-  <div id="page-welcome" class="page">
-    <div class="container text-center" style="margin-top: 100px;">
-      <img src="assets/bloobotlogoofficialblacktext.png" alt="Logo" style="max-width:200px; margin-bottom:20px;">
-      <h1>Welcome to Bloo</h1>
-      <p>Please sign in or create an account to continue.</p>
-      <button id="sign-in-btn" class="btn btn-primary mb-2">Sign In</button>
-      <br>
-      <button id="create-account-btn" class="btn btn-secondary">Create Account</button>
+ <!-- Page 1: Welcome Screen (Modernized) -->
+<div id="page-welcome" class="page">
+  <div class="container d-flex align-items-center justify-content-center" style="min-height: 100vh;">
+    <div class="card p-4 shadow" style="max-width: 400px; width: 100%;">
+      <div class="text-center mb-4">
+        <img src="assets/bloobotlogoofficialblacktext.png" alt="Logo" style="max-width:150px;">
+      </div>
+      <h1 class="h3 text-center mb-3">Welcome to Bloo</h1>
+      <p class="text-center text-muted mb-4">Sign in or create an account to continue</p>
+      <div class="d-grid gap-2">
+        <button id="sign-in-btn" class="btn btn-primary">Sign In</button>
+        <button id="create-account-btn" class="btn btn-outline-secondary">Create Account</button>
+      </div>
     </div>
   </div>
+</div>
 
   <!-- Page 2: Upload Screen -->
   <div id="page-upload" class="page">
     <div class="container text-center">
       <div id="drop-zone" class="dropzone-container mx-auto">
-        <p>Drag & drop your file here<br>or click to select</p>
-        <input type="file" id="fileUpload" accept=".pdf,.pptx,.docx,.xlsx" multiple style="display: none;">
-        <button id="uploadBtn" class="btn">Upload File</button>
+        <!-- Modernized Upload UI: Inline SVG Icon -->
+        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="#007bff" class="bi bi-cloud-upload" viewBox="0 0 16 16">
+          <path d="M4.406 8.342a5.53 5.53 0 0 1 9.188-1.342A3.5 3.5 0 0 1 15.5 8a3.5 3.5 0 0 1-1.032 2.342A4.5 4.5 0 0 1 8 13.5a4.5 4.5 0 0 1-4.468-3.158zM8 0a5 5 0 0 0-4.546 2.914A3.5 3.5 0 0 0 1.5 7a3.5 3.5 0 0 0 1.032 2.342A4.5 4.5 0 0 0 8 13.5a4.5 4.5 0 0 0 4.468-3.158A3.5 3.5 0 0 0 14.5 7a3.5 3.5 0 0 0-1.032-2.342A5 5 0 0 0 8 0zm.5 8V5h-1v3H5l3 3 3-3h-2.5z"/>
+        </svg>
+        <p>Drag &amp; drop your files here, or click to select</p>
+        <!-- Full-size transparent file input for click functionality -->
+        <input type="file" id="fileUpload" accept=".pdf,.pptx,.docx,.xlsx" multiple>
         <div class="supported-formats">
           <p>Supported documents:</p>
           <ul class="list-inline">
@@ -362,7 +379,7 @@
           <h3>What Bloo Can Do</h3>
           <ul>
             <li>Analyze your coursework files</li>
-            <li>Break down homework & assignments</li>
+            <li>Break down homework &amp; assignments</li>
             <li>Provide step-by-step guidance</li>
             <li>Customize responses (coursework-specific or general)</li>
             <li>Promote deeper learning through interactive explanations</li>
@@ -719,6 +736,8 @@
       if (selectedFiles.length) {
         updateFileList(Array.from(selectedFiles));
         handleFileUploads(selectedFiles);
+        // Clear the file input so that the same file can be selected again if needed
+        fileInput.value = "";
       }
     });
 
