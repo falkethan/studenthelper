@@ -206,6 +206,16 @@
       left: 0;
       color: #007bff;
     }
+    /* New Upload Info Block CSS */
+    .upload-info h2 {
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+    }
+    .upload-info p {
+      font-size: 16px;
+      color: #212529;
+      margin-bottom: 1rem;
+    }
     #progressContainer {
       width: 100%;
       height: 4px;
@@ -313,6 +323,10 @@
       textarea.form-control { padding-right: 50px; }
       #send { width: 35px; height: 35px; font-size: 1rem; }
     }
+    #page-welcome {
+      background: url('assets/website-background-2.png') no-repeat center center;
+      background-size: cover;
+    }
   </style>
 </head>
 <body>
@@ -322,57 +336,127 @@
     <button id="logout-btn" class="btn btn-secondary" style="display:none;">Logout</button>
   </div>
 
-  <!-- Page 1: Welcome Screen (Modernized) -->
-  <div id="page-welcome" class="page">
-    <div class="container d-flex align-items-center justify-content-center" style="min-height: 100vh;">
-      <div class="card p-4 shadow" style="max-width: 400px; width: 100%;">
-        <div class="text-center mb-4">
-          <img src="assets/bloobotlogoofficialblacktext.png" alt="Logo" style="max-width:150px;">
+<!-- Page 1: Welcome Screen (Two-Column Layout) -->
+<div id="page-welcome" class="page" style="min-height: 100vh; background: url('assets/website-background-2.png') no-repeat center center; background-size: cover;">
+  <div class="container py-5">
+    <div class="row align-items-center">
+      <!-- Left Column: Info Box -->
+      <div class="col-md-6 d-flex justify-content-center mb-4 mb-md-0">
+        <div class="card p-5 shadow" style="background: rgba(0, 123, 255, 0.9); border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); width: 100%; max-width: 500px;">
+          <h1 class="mb-4" style="font-size: 2.5rem; font-weight: 700; color: #fff; text-align: center;">
+            Your <span style="color: #ffffff;">AI-Powered</span> Homework Helper
+          </h1>
+          <div class="row g-3 mb-4">
+            <!-- Feature 1 -->
+            <div class="col-6">
+              <h4 class="fw-bold" style="color: #fff; text-align: center;">24/7</h4>
+              <p style="color: #fff; text-align: center;">Personal Tutor</p>
+            </div>
+            <!-- Feature 2 -->
+            <div class="col-6">
+              <h4 class="fw-bold" style="color: #fff; text-align: center;">Rapid</h4>
+              <p style="color: #fff; text-align: center;">Processing</p>
+            </div>
+            <!-- Feature 3 -->
+            <div class="col-6">
+              <h4 class="fw-bold" style="color: #fff; text-align: center;">Instant</h4>
+              <p style="color: #fff; text-align: center;">Responses</p>
+            </div>
+            <!-- Feature 4 -->
+            <div class="col-6">
+              <h4 class="fw-bold" style="color: #fff; text-align: center;">100%</h4>
+              <p style="color: #fff; text-align: center;">Accurate</p>
+            </div>
+          </div>
+          <p style="color: #fff; text-align: center;">
+            Bloo is built <strong>exclusively</strong> for students and educators, offering personalized, <strong>coursework-based</strong> assistance that understands your coursework and helps you succeed.
+          </p>
         </div>
-        <h1 class="h3 text-center mb-3">Welcome to Bloo</h1>
-        <p class="text-center text-muted mb-4">Sign in or create an account to continue</p>
-        <div class="d-grid gap-2">
-          <button id="sign-in-btn" class="btn btn-primary">Sign In</button>
-          <button id="create-account-btn" class="btn btn-outline-secondary">Create Account</button>
+      </div>
+      <!-- Right Column: Sign-In Card -->
+      <div class="col-md-6 d-flex justify-content-center">
+        <div class="card p-4 shadow" style="max-width: 400px; width: 100%; background: rgba(248,249,250,0.95); border: 1px solid #ddd; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+          <div class="text-center mb-4">
+            <img src="assets/bloobotlogoofficialblacktext.png" alt="Logo" style="max-width:150px;">
+          </div>
+          <h1 class="h3 text-center mb-3" style="color: #212529;">Welcome to Bloo</h1>
+          <p class="text-center text-muted mb-4">Sign in or create an account to continue</p>
+          <div class="d-grid gap-2">
+            <button id="sign-in-btn" class="btn btn-primary">Sign In</button>
+            <button id="create-account-btn" class="btn btn-outline-secondary">Create Account</button>
+          </div>
         </div>
       </div>
     </div>
   </div>
+</div>
 
-  <!-- Page 2: Upload Screen -->
-  <div id="page-upload" class="page">
-    <div class="container text-center">
-      <div id="drop-zone" class="dropzone-container mx-auto">
-        <!-- Modernized Upload UI: Inline SVG Icon -->
-        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="#007bff" class="bi bi-cloud-upload" viewBox="0 0 16 16">
-          <path d="M4.406 8.342a5.53 5.53 0 0 1 9.188-1.342A3.5 3.5 0 0 1 15.5 8a3.5 3.5 0 0 1-1.032 2.342A4.5 4.5 0 0 1 8 13.5a4.5 4.5 0 0 1-4.468-3.158zM8 0a5 5 0 0 0-4.546 2.914A3.5 3.5 0 0 0 1.5 7a3.5 3.5 0 0 0 1.032 2.342A4.5 4.5 0 0 0 8 13.5a4.5 4.5 0 0 0 4.468-3.158A3.5 3.5 0 0 0 14.5 7a3.5 3.5 0 0 0-1.032-2.342A5 5 0 0 0 8 0zm.5 8V5h-1v3H5l3 3 3-3h-2.5z"/>
-        </svg>
-        <p>Drag &amp; drop your files here, or click to select</p>
-        <!-- Full-size transparent file input for click functionality -->
-        <input type="file" id="fileUpload" accept=".pdf,.pptx,.docx,.xlsx" multiple>
-        <div class="supported-formats">
-          <p>Supported documents:</p>
-          <ul class="list-inline">
-            <li class="list-inline-item"><img src="assets/pdf-logo.png" alt="PDF"> .pdf</li>
-            <li class="list-inline-item"><img src="assets/docx-logo.png" alt="DOCX"> .docx</li>
-            <li class="list-inline-item"><img src="assets/pptx-logo.png" alt="PPTX"> .pptx</li>
-            <li class="list-inline-item"><img src="assets/excel-logo.png" alt="Excel"> .xlsx</li>
-          </ul>
-        </div>
-        <div id="file-list"></div>
+  <!-- New Page: Info about Bloo -->
+<div id="page-info" class="page">
+  <div class="container">
+    <div class="card p-5 shadow mb-4 mx-auto" style="max-width: 600px;">
+      <div class="card-body text-center">
+        <h2 class="card-title mb-3">Discover Bloo</h2>
+        <p class="card-text">
+          Bloo is your dedicated personal education AI, engineered to provide coursework‑specific insights that go far beyond generic responses. While other AIs like ChatGPT offer broad knowledge, Bloo dives deep into your course documents and assignments to deliver answers and guidance tailored precisely to your curriculum.
+        </p>
+        <ul class="list-group list-group-flush mb-3 text-start">
+          <li class="list-group-item">🔍 <strong>Curriculum‑Focused:</strong> Responses based on your own course materials.</li>
+          <li class="list-group-item">🎯 <strong>Targeted Guidance:</strong> Step‑by‑step support for complex assignments.</li>
+          <li class="list-group-item">🚀 <strong>Enhanced Learning:</strong> Personalized insights that boost academic success.</li>
+        </ul>
+        <p class="card-text">
+          Experience the difference of an AI built exclusively for your educational needs. Start by uploading your files or jump directly into a chat with Bloo.
+        </p>
       </div>
-      <!-- "Chat with Bloo" button above Skip to Chat -->
-      <button id="chat-btn" class="btn btn-primary mt-3">Chat with Bloo</button>
+    </div>
+    <div class="d-flex justify-content-center gap-3">
+      <button id="upload-files-btn" class="btn btn-primary">Upload Files</button>
+      <button id="skip-to-bloo-btn" class="btn btn-secondary">Skip to Bloo</button>
+    </div>
+  </div>
+</div>
+
+
+
+
+ <!-- Page 2: Upload Screen -->
+<div id="page-upload" class="page">
+  <div class="container text-center position-relative">
+    <!-- Back button positioned in the top left -->
+    <button id="back-to-info-btn" class="btn btn-link position-absolute start-0 top-0 m-3">&larr; Back</button>
+    <div id="drop-zone" class="dropzone-container mx-auto">
+      <!-- Modernized Upload UI: Inline SVG Icon -->
+      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="#007bff" class="bi bi-cloud-upload" viewBox="0 0 16 16">
+        <path d="M4.406 8.342a5.53 5.53 0 0 1 9.188-1.342A3.5 3.5 0 0 1 15.5 8a3.5 3.5 0 0 1-1.032 2.342A4.5 4.5 0 0 1 8 13.5a4.5 4.5 0 0 1-4.468-3.158zM8 0a5 5 0 0 0-4.546 2.914A3.5 3.5 0 0 0 1.5 7a3.5 3.5 0 0 0 1.032 2.342A4.5 4.5 0 0 0 8 13.5a4.5 4.5 0 0 0 4.468-3.158A3.5 3.5 0 0 0 14.5 7a3.5 3.5 0 0 0-1.032-2.342A5 5 0 0 0 8 0zm.5 8V5h-1v3H5l3 3 3-3h-2.5z"/>
+      </svg>
+      <p>Drag &amp; drop your files here, or click to select</p>
+      <!-- Full-size transparent file input for click functionality -->
+      <input type="file" id="fileUpload" accept=".pdf,.pptx,.docx,.xlsx" multiple>
+      <div class="supported-formats">
+        <p>Supported documents:</p>
+        <ul class="list-inline">
+          <li class="list-inline-item"><img src="assets/pdf-logo.png" alt="PDF"> .pdf</li>
+          <li class="list-inline-item"><img src="assets/docx-logo.png" alt="DOCX"> .docx</li>
+          <li class="list-inline-item"><img src="assets/pptx-logo.png" alt="PPTX"> .pptx</li>
+          <li class="list-inline-item"><img src="assets/excel-logo.png" alt="Excel"> .xlsx</li>
+        </ul>
+      </div>
+      <div id="file-list"></div>
+    </div>
+    <div class="text-center mt-3">
+      <button id="chat-btn" class="btn btn-primary">Chat with Bloo</button>
       <br>
       <button id="skip-btn" class="btn btn-secondary mt-2">Skip to Chat</button>
     </div>
   </div>
+</div>
+
 
   <!-- Page 3: Chat Screen -->
   <div id="page-chat" class="page">
     <div class="container">
       <div class="main-container" style="display: flex; gap: 20px; align-items: flex-start;">
-        
         <!-- LEFT COLUMN: "What Bloo Can Do" -->
         <div class="info-container" style="order: 1; flex: 1;">
           <h3>What Bloo Can Do</h3>
@@ -388,7 +472,6 @@
             <small class="d-block mt-1 text-muted">This is a prototype. This does not work yet.</small>
           </div>
         </div>
-
         <!-- CENTER COLUMN: Chat Container -->
         <div class="chat-container" style="order: 2; flex: 2;">
           <div class="chat-header">
@@ -401,17 +484,15 @@
           </div>
           <!-- Chat input with arrow inside -->
           <div class="chat-input-container">
-            <textarea id="prompt" class="form-control" placeholder="Hey, I'm Bloo. What class can I help you with?" rows="1"></textarea>
+            <textarea id="prompt" class="form-control" placeholder="Ask a question..." rows="1"></textarea>
             <button id="send" class="btn">&#8594;</button>
           </div>
           <div class="text-center" style="margin-top: 20px;">
             <button id="back-to-upload-btn" class="btn btn-secondary">Upload More Files</button>
           </div>
         </div>
-
         <!-- RIGHT COLUMN: Feature Boxes (vertical) -->
         <div class="feature-cards" style="order: 3; flex: 1; display: flex; flex-direction: column; gap: 20px;">
-          
           <!-- Feature Block 1: Course Material Analysis -->
           <div class="card feature-box text-center">
             <button class="btn btn-primary preset-btn mb-2" data-prompt="Please analyze my course materials.">Analyze Materials</button>
@@ -420,7 +501,6 @@
               Let Bloo analyze your uploaded course materials. Receive clear summaries and insights tailored to your syllabus.
             </p>
           </div>
-
           <!-- Feature Block 2: Homework Breakdown -->
           <div class="card feature-box text-center">
             <button class="btn btn-primary preset-btn mb-2" data-prompt="Help me break down my homework.">Help with Homework</button>
@@ -429,7 +509,6 @@
               Struggling with assignments? Bloo breaks down your homework into manageable steps, guiding you through each task.
             </p>
           </div>
-
           <!-- Feature Block 3: Interactive Study Guidance -->
           <div class="card feature-box text-center">
             <button class="btn btn-primary preset-btn mb-2" data-prompt="I need interactive study guidance.">Study Guidance</button>
@@ -438,9 +517,7 @@
               Elevate your study game with personalized tips, curated resources, and dynamic Q&amp;A sessions to boost your learning.
             </p>
           </div>
-          
         </div>
-
       </div>
     </div>
   </div>
@@ -469,13 +546,10 @@
           $(this).css("pointer-events", "auto");
       });
     }
-
     // --------- Auth0 Integration -----------
     let auth0Client = null;
     let userProfile = null;
-
     const fetchAuthConfig = () => fetch("/auth_config.json");
-
     const configureClient = async () => {
       try {
         const response = await fetchAuthConfig();
@@ -490,7 +564,6 @@
         console.log("Error configuring Auth0 client:", err);
       }
     };
-
     const login = async (targetUrl) => {
       try {
         const options = {
@@ -505,7 +578,6 @@
         console.log("Log in failed", err);
       }
     };
-
     const logout = async () => {
       try {
         await auth0Client.logout({
@@ -517,7 +589,6 @@
         console.log("Log out failed", err);
       }
     };
-
     const updateAuthUI = async () => {
       try {
         const isAuthenticated = await auth0Client.isAuthenticated();
@@ -535,12 +606,10 @@
         console.log("Error updating UI!", err);
       }
     };
-
     // --------- Attach Auth0 event listeners and process redirect callback -----------
     window.onload = async () => {
       await configureClient();
       document.getElementById("login-btn").disabled = false;
-      
       if (window.location.search.includes("code=") && window.location.search.includes("state=")) {
         try {
           await auth0Client.handleRedirectCallback();
@@ -554,12 +623,14 @@
       await updateAuthUI();
       const isAuthenticated = await auth0Client.isAuthenticated();
       if (isAuthenticated) {
-        showPage("page-upload");
+        showPage("page-info");
       } else {
         showPage("page-welcome");
       }
-      
       // Attach event listeners for auth buttons
+      document.getElementById("back-to-info-btn").addEventListener("click", () => {
+  showPage("page-info");
+});
       document.getElementById("sign-in-btn").addEventListener("click", () => {
         console.log("Sign In clicked");
         login();
@@ -575,21 +646,28 @@
       document.getElementById("logout-btn").addEventListener("click", () => {
         logout();
       });
-      
+      // New Info Page Buttons
+      document.getElementById("upload-files-btn").addEventListener("click", () => {
+        showPage("page-upload");
+      });
+      document.getElementById("skip-to-bloo-btn").addEventListener("click", () => {
+        showPage("page-chat");
+      });
       // Attach event listener for "Chat with Bloo" button on the Upload Page
       document.getElementById("chat-btn").addEventListener("click", () => {
         showPage("page-chat");
       });
     };
-
     document.getElementById("skip-btn").addEventListener("click", () => {
       showPage("page-chat");
     });
-
     document.getElementById("back-to-upload-btn").addEventListener("click", () => {
       showPage("page-upload");
     });
-
+    document.getElementById('prompt').addEventListener('input', function() {
+      this.style.height = 'auto';
+      this.style.height = this.scrollHeight + 'px';
+    });
     let conversation = [];
     const messagesEl = document.getElementById('messages');
     const promptEl = document.getElementById('prompt');
@@ -597,7 +675,6 @@
     const API_URL = window.location.hostname === "localhost"
       ? "http://localhost:8888/.netlify/functions/ask"
       : "/.netlify/functions/ask";
-
     function addMessage(text, sender) {
       const msgDiv = document.createElement('div');
       msgDiv.className = 'message ' + sender + ' mb-2';
@@ -609,36 +686,32 @@
       messagesEl.appendChild(msgDiv);
       messagesEl.scrollTop = messagesEl.scrollHeight;
     }
-
     // Enhanced markdown parser: converts headings, bold, italic and bullet lists
     function markdownToHTML(markdown) {
-  let output = markdown;
-  // Convert headings
-  output = output.replace(/^###### (.*)$/gm, '<h6>$1</h6>');
-  output = output.replace(/^##### (.*)$/gm, '<h5>$1</h5>');
-  output = output.replace(/^#### (.*)$/gm, '<h4>$1</h4>');
-  output = output.replace(/^### (.*)$/gm, '<h3>$1</h3>');
-  output = output.replace(/^## (.*)$/gm, '<h2>$1</h2>');
-  output = output.replace(/^# (.*)$/gm, '<h1>$1</h1>');
-  // Bold and italic
-  output = output.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-  output = output.replace(/\*(.+?)\*/g, '<em>$1</em>');
-  // Unordered list items: lines starting with -, +, or *
-  output = output.replace(/(?:^|\n)[-+*]\s+(.*)/g, '\n<li>$1</li>');
-  // Ordered list items: lines starting with a number and a period
-  output = output.replace(/(?:^|\n)\d+\.\s+(.*)/g, '\n<li>$1</li>');
-  // Wrap contiguous <li> blocks in an unordered list
-  output = output.replace(/((?:<li>.*<\/li>\n?)+)/g, '<ul>$1</ul>');
-  return output;
-}
-
-
+      let output = markdown;
+      // Convert headings
+      output = output.replace(/^###### (.*)$/gm, '<h6>$1</h6>');
+      output = output.replace(/^##### (.*)$/gm, '<h5>$1</h5>');
+      output = output.replace(/^#### (.*)$/gm, '<h4>$1</h4>');
+      output = output.replace(/^### (.*)$/gm, '<h3>$1</h3>');
+      output = output.replace(/^## (.*)$/gm, '<h2>$1</h2>');
+      output = output.replace(/^# (.*)$/gm, '<h1>$1</h1>');
+      // Bold and italic
+      output = output.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+      output = output.replace(/\*(.+?)\*/g, '<em>$1</em>');
+      // Unordered list items: lines starting with -, +, or *
+      output = output.replace(/(?:^|\n)[-+*]\s+(.*)/g, '\n<li>$1</li>');
+      // Ordered list items: lines starting with a number and a period
+      output = output.replace(/(?:^|\n)\d+\.\s+(.*)/g, '\n<li>$1</li>');
+      // Wrap contiguous <li> blocks in an unordered list
+      output = output.replace(/((?:<li>.*<\/li>\n?)+)/g, '<ul>$1</ul>');
+      return output;
+    }
     function intoPieces(text) {
       if (/^\s*$/.test(text)) return [text];
       const pieces = text.match(/(\s*\S+\s*)/g);
       return pieces || [];
     }
-
     function typeWriter(text, element, speed = 30) {
       let i = 0;
       const interval = setInterval(() => {
@@ -647,7 +720,6 @@
         if (i > text.length) clearInterval(interval);
       }, speed);
     }
-
     function addBotMessageWithFormattingAndTyping(text, wpm) {
       const msgDiv = document.createElement('div');
       msgDiv.className = 'message bot mb-2';
@@ -664,7 +736,6 @@
         if (expectedCount >= pieces.length) clearInterval(interval);
       }, 200);
     }
-
     let progressInterval;
     function startProgress() {
       const progressContainer = document.getElementById('progressContainer');
@@ -687,7 +758,6 @@
       clearInterval(progressInterval);
       setTimeout(() => { document.getElementById('progressContainer').style.display = 'none'; }, 500);
     }
-
     sendBtn.addEventListener('click', async () => {
       const promptText = promptEl.value.trim();
       if (!promptText) return;
@@ -716,24 +786,20 @@
         finishProgress();
       }
     });
-
     promptEl.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
         sendBtn.click();
       }
     });
-
     document.querySelectorAll('.preset-btn').forEach(button => {
       button.addEventListener('click', () => {
         promptEl.value = button.getAttribute('data-prompt');
         sendBtn.click();
       });
     });
-
     const dropZone = document.getElementById("drop-zone");
     const fileInput = document.getElementById("fileUpload");
-
     dropZone.addEventListener("click", () => { fileInput.click(); });
     dropZone.addEventListener("dragover", (e) => { e.preventDefault(); dropZone.classList.add("hover"); });
     dropZone.addEventListener("dragleave", (e) => { e.preventDefault(); dropZone.classList.remove("hover"); });
@@ -755,7 +821,6 @@
         fileInput.value = "";
       }
     });
-
     let uploadProgressInterval;
     function startUploadProgress() {
       const container = document.getElementById("upload-progress-container");
@@ -830,7 +895,6 @@
         xhr.send(formData);
       });
     }
-    
     function updateFileList(files) {
       const fileListContainer = document.getElementById("file-list");
       if (!fileListContainer) return;
@@ -842,12 +906,10 @@
       fileListContainer.innerHTML = html;
     }
   </script>
-
   <script>
     window.addEventListener('DOMContentLoaded', () => {
-      addMessage("Ask a question", "bot");
+      addMessage("Hey, I'm Bloo. What can I help you with?", "bot");
     });
   </script>
-  
 </body>
 </html>
