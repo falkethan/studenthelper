@@ -11,18 +11,22 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Bloo - Your Personal Education AI</title>
-  <!-- Load Fonts and Bootstrap (integrity removed to avoid digest errors) -->
+  <!-- Load Fonts and Bootstrap -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" 
         rel="stylesheet" 
         crossorigin="anonymous">
   <style>
-    /* Bloobot dark theme CSS */
+    /* Bloo Light Theme CSS */
     body {
-      background: #040026;
-      color: #e0e0e0;
+      background: #ffffff;
+      color: #212529;
       font-family: 'Roboto', sans-serif;
       padding: 20px;
+    }
+    .page {
+      display: none;
+      pointer-events: auto;
     }
     .main-container {
       display: flex;
@@ -33,23 +37,23 @@
       flex: 1;
       max-width: 300px;
       height: 575px;
-      background: #1e1e1e;
+      background: #ffffff;
       border: 2px dashed #007bff;
       border-radius: 8px;
       padding: 20px;
       text-align: center;
-      color: #ccc;
+      color: #495057;
       transition: background 0.3s ease;
       cursor: pointer;
     }
     .dropzone-container.hover {
-      background: #2c2c2c;
+      background: #e9ecef;
     }
     .dropzone-container p { margin: 0; }
     .supported-formats {
       margin-top: 15px;
       font-size: 14px;
-      color: #aaa;
+      color: #6c757d;
     }
     .supported-formats ul {
       list-style: none;
@@ -67,7 +71,7 @@
       vertical-align: middle;
       margin-right: 5px;
     }
-    /* NEW: File list container styling */
+    /* File list styling */
     #file-list {
       margin-top: 15px;
       text-align: left;
@@ -80,7 +84,7 @@
     #file-list li {
       margin-bottom: 5px;
       font-size: 14px;
-      color: #ddd;
+      color: #495057;
     }
     #file-list li span.file-icon {
       margin-right: 5px;
@@ -98,10 +102,11 @@
     #uploadBtn:hover { background-color: #218838; }
     .chat-container {
       flex: 2;
-      background: #1e1e1e;
+      background: #ffffff;
       padding: 20px;
       border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      border: 1px solid #ced4da;
     }
     .chat-header {
       display: flex;
@@ -115,15 +120,15 @@
       margin-right: 15px;
       object-fit: cover;
     }
-    .chat-header h2 { margin: 0; color: #fff; }
+    .chat-header h2 { margin: 0; color: #212529; }
     .messages {
       height: 400px;
       overflow-y: auto;
-      border: 1px solid #333;
+      border: 1px solid #ced4da;
       padding: 10px;
       margin-bottom: 15px;
       border-radius: 5px;
-      background: #2c2c2c;
+      background: #f8f9fa;
     }
     .message {
       margin-bottom: 10px;
@@ -132,63 +137,56 @@
       border-radius: 5px;
     }
     .message.user {
-      background: rgba(255, 255, 255, 0.1);
-      color: #fff;
+      background: #e9ecef;
+      color: #212529;
     }
+    /* Updated Bot Message Styling */
     .message.bot {
-      background: rgba(173, 216, 230, 0.1);
-      color: #add8e6;
-    }
-    textarea.form-control {
-      background: #333;
-      color: #e0e0e0;
-      border: 1px solid #444;
+      background: #cce5ff;
+      color: #004085;
+      padding: 8px;
       border-radius: 5px;
     }
-    .input-group {
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    textarea.form-control {
+      background: #ffffff;
+      color: #212529;
+      border: 1px solid #ced4da;
+      border-radius: 5px;
+      width: 100%;
+      padding-right: 50px; /* make space for the arrow button */
     }
-    .input-group textarea { width: 80%; margin-right: 10px; }
-    button#send {
+    /* New container for chat input with arrow inside */
+    .chat-input-container {
+      position: relative;
+      margin-bottom: 1rem;
+    }
+    #send {
+      position: absolute;
+      top: 50%;
+      right: 10px;
+      transform: translateY(-50%);
       background: #007bff;
       border: none;
       border-radius: 50%;
-      font-weight: 500;
-      transition: background 0.3s ease;
       width: 40px;
       height: 40px;
       font-size: 1.2rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
       color: #fff;
-    }
-    button#send:hover { background: #0056b3; }
-    #preset-prompts {
-      margin-bottom: 15px;
-      text-align: center;
-    }
-    #preset-prompts button {
-      margin: 0 5px;
-      background: #007bff;
-      border: none;
-      color: #fff;
+      cursor: pointer;
       transition: background 0.3s ease;
-      padding: 8px 12px;
-      border-radius: 4px;
     }
-    #preset-prompts button:hover { background: #0056b3; }
+    #send:hover { background: #0056b3; }
+    /* Preset prompts removed as requested */
     .info-container {
       flex: 1;
       max-width: 300px;
-      background: #1e1e1e;
+      background: #ffffff;
       border-radius: 8px;
       padding: 20px;
-      color: #ccc;
+      color: #495057;
+      border: 1px solid #ced4da;
     }
-    .info-container h3 { color: #fff; margin-bottom: 15px; }
+    .info-container h3 { color: #212529; margin-bottom: 15px; }
     .info-container ul { list-style: none; padding-left: 0; }
     .info-container li {
       margin-bottom: 10px;
@@ -205,7 +203,7 @@
       width: 100%;
       height: 4px;
       background: transparent;
-      border: 1px solid white;
+      border: 1px solid #ced4da;
       border-radius: 2px;
       overflow: hidden;
       margin-bottom: 10px;
@@ -214,7 +212,7 @@
     #progressBar {
       width: 0%;
       height: 100%;
-      background-color: #fff;
+      background-color: #007bff;
       transition: width 0.2s ease-in-out;
     }
     /* Loading Overlay for file uploads */
@@ -224,8 +222,7 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0, 0, 0, 0.7);
-      backdrop-filter: blur(4px);
+      background: rgba(255, 255, 255, 0.8);
       display: none;
       align-items: center;
       justify-content: center;
@@ -245,7 +242,7 @@
       width: 80%;
       height: 4px;
       background: transparent;
-      border: 1px solid white;
+      border: 1px solid #ced4da;
       border-radius: 2px;
       overflow: hidden;
       margin-top: 20px;
@@ -254,7 +251,7 @@
     #upload-progress-bar {
       width: 0%;
       height: 100%;
-      background-color: #fff;
+      background-color: #007bff;
       transition: width 0.2s ease-in-out;
     }
     @keyframes spin {
@@ -281,11 +278,33 @@
       z-index: 10000;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     }
+    /* Feature Boxes Styling */
+    .feature-box {
+      background: #ffffff;
+      border: none;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      padding: 20px;
+    }
+    .feature-box:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
+    }
+    .feature-box h4 {
+      font-weight: 500;
+      margin-bottom: 10px;
+    }
+    .feature-box p {
+      font-size: 14px;
+      color: #6c757d;
+      margin-bottom: 0;
+    }
     @media (max-width: 576px) {
       .main-container { flex-direction: column; }
       .dropzone-container, .chat-container, .info-container { max-width: 100%; }
-      .input-group textarea { width: 70%; }
-      button#send { width: 35px; height: 35px; font-size: 1rem; }
+      textarea.form-control { padding-right: 50px; }
+      #send { width: 35px; height: 35px; font-size: 1rem; }
     }
   </style>
 </head>
@@ -297,20 +316,20 @@
   </div>
 
   <!-- Page 1: Welcome Screen -->
-  <div id="page-welcome" class="page" style="display:none;">
+  <div id="page-welcome" class="page">
     <div class="container text-center" style="margin-top: 100px;">
-      <!-- NEW: Logo placeholder -->
-      <img src="assets/bloobotlogo.png" alt="Logo" style="max-width:200px; margin-bottom:20px;">
+      <img src="assets/bloobotlogoofficialblacktext.png" alt="Logo" style="max-width:200px; margin-bottom:20px;">
       <h1>Welcome to Bloo</h1>
       <p>Please sign in or create an account to continue.</p>
-      <button id="welcome-login-btn" class="btn btn-primary">Sign In / Create Account</button>
+      <button id="sign-in-btn" class="btn btn-primary mb-2">Sign In</button>
+      <br>
+      <button id="create-account-btn" class="btn btn-secondary">Create Account</button>
     </div>
   </div>
 
   <!-- Page 2: Upload Screen -->
-  <div id="page-upload" class="page" style="display:none;">
+  <div id="page-upload" class="page">
     <div class="container text-center">
-      <!-- File Upload Section -->
       <div id="drop-zone" class="dropzone-container mx-auto">
         <p>Drag & drop your file here<br>or click to select</p>
         <input type="file" id="fileUpload" accept=".pdf,.pptx,.docx,.xlsx" multiple style="display: none;">
@@ -321,47 +340,25 @@
             <li class="list-inline-item"><img src="assets/pdf-logo.png" alt="PDF"> .pdf</li>
             <li class="list-inline-item"><img src="assets/docx-logo.png" alt="DOCX"> .docx</li>
             <li class="list-inline-item"><img src="assets/pptx-logo.png" alt="PPTX"> .pptx</li>
-            <li class="list-inline-item"><img src="assets/excel-logo.png" alt="PPTX"> .xlsx</li>
+            <li class="list-inline-item"><img src="assets/excel-logo.png" alt="Excel"> .xlsx</li>
           </ul>
         </div>
-        <!-- File list container -->
         <div id="file-list"></div>
       </div>
-      <!-- NEW: Skip to Chat button placed outside the drop zone -->
-      <button id="skip-btn" class="btn btn-secondary mt-3">Skip to Chat</button>
+      <!-- "Chat with Bloo" button above Skip to Chat -->
+      <button id="chat-btn" class="btn btn-primary mt-3">Chat with Bloo</button>
+      <br>
+      <button id="skip-btn" class="btn btn-secondary mt-2">Skip to Chat</button>
     </div>
   </div>
 
   <!-- Page 3: Chat Screen -->
-  <div id="page-chat" class="page" style="display:none;">
+  <div id="page-chat" class="page">
     <div class="container">
-      <div class="main-container">
-        <!-- Chat Section -->
-        <div class="chat-container">
-          <div class="chat-header">
-            <img src="assets/bloobotlogoimage.png" alt="Bloo Profile Picture">
-            <h2>Bloo</h2>
-          </div>
-          <div class="messages mb-3" id="messages"></div>
-          <div id="progressContainer">
-            <div id="progressBar"></div>
-          </div>
-          <div id="preset-prompts" class="mb-3">
-            <button class="btn preset-btn" data-prompt="I need help with my homework">Help with homework</button>
-            <button class="btn preset-btn" data-prompt="I want you to summarize this reading for my class">Summarize reading</button>
-            <button class="btn preset-btn" data-prompt="What can you help me with?">More</button>
-          </div>
-          <div class="input-group mb-3">
-            <textarea id="prompt" class="form-control" placeholder="Hey, I'm Bloo. What class can I help you with?" rows="1" style="resize: none;"></textarea>
-            <button id="send" class="btn">&#8594;</button>
-          </div>
-          <!-- Upload More Files Button -->
-          <div style="margin-top: 20px; text-align: center;">
-            <button id="back-to-upload-btn" class="btn btn-secondary">Upload More Files</button>
-          </div>
-        </div>
-        <!-- Information Panel -->
-        <div class="info-container">
+      <div class="main-container" style="display: flex; gap: 20px; align-items: flex-start;">
+        
+        <!-- LEFT COLUMN: "What Bloo Can Do" -->
+        <div class="info-container" style="order: 1; flex: 1;">
           <h3>What Bloo Can Do</h3>
           <ul>
             <li>Analyze your coursework files</li>
@@ -375,6 +372,59 @@
             <small class="d-block mt-1 text-muted">This is a prototype. This does not work yet.</small>
           </div>
         </div>
+
+        <!-- CENTER COLUMN: Chat Container -->
+        <div class="chat-container" style="order: 2; flex: 2;">
+          <div class="chat-header">
+            <img src="assets/bloobotlogoimage.png" alt="Bloo Profile Picture">
+            <h2>Bloo</h2>
+          </div>
+          <div class="messages mb-3" id="messages"></div>
+          <div id="progressContainer">
+            <div id="progressBar"></div>
+          </div>
+          <!-- Chat input with arrow inside -->
+          <div class="chat-input-container">
+            <textarea id="prompt" class="form-control" placeholder="Hey, I'm Bloo. What class can I help you with?" rows="1"></textarea>
+            <button id="send" class="btn">&#8594;</button>
+          </div>
+          <div class="text-center" style="margin-top: 20px;">
+            <button id="back-to-upload-btn" class="btn btn-secondary">Upload More Files</button>
+          </div>
+        </div>
+
+        <!-- RIGHT COLUMN: Feature Boxes (vertical) -->
+        <div class="feature-cards" style="order: 3; flex: 1; display: flex; flex-direction: column; gap: 20px;">
+          
+          <!-- Feature Block 1: Course Material Analysis -->
+          <div class="card feature-box text-center">
+            <button class="btn btn-primary preset-btn mb-2" data-prompt="Please analyze my course materials.">Analyze Materials</button>
+            <h4>Course Material Analysis</h4>
+            <p>
+              Let Bloo analyze your uploaded course materials. Receive clear summaries and insights tailored to your syllabus.
+            </p>
+          </div>
+
+          <!-- Feature Block 2: Homework Breakdown -->
+          <div class="card feature-box text-center">
+            <button class="btn btn-primary preset-btn mb-2" data-prompt="Help me break down my homework.">Help with Homework</button>
+            <h4>Homework Breakdown</h4>
+            <p>
+              Struggling with assignments? Bloo breaks down your homework into manageable steps, guiding you through each task.
+            </p>
+          </div>
+
+          <!-- Feature Block 3: Interactive Study Guidance -->
+          <div class="card feature-box text-center">
+            <button class="btn btn-primary preset-btn mb-2" data-prompt="I need interactive study guidance.">Study Guidance</button>
+            <h4>Interactive Study Guidance</h4>
+            <p>
+              Elevate your study game with personalized tips, curated resources, and dynamic Q&amp;A sessions to boost your learning.
+            </p>
+          </div>
+          
+        </div>
+
       </div>
     </div>
   </div>
@@ -393,14 +443,15 @@
   <!-- Script dependencies -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <!-- Load Auth0 SPA SDK (version 2.0) before our custom script -->
   <script src="https://cdn.auth0.com/js/auth0-spa-js/2.0/auth0-spa-js.production.js"></script>
   <!-- Combined Auth0 and Bloobot logic -->
   <script>
-    // --------- Utility: Simple Router -----------
+    // --------- Utility: Simple Router with Transitions -----------
     function showPage(pageId) {
-      document.querySelectorAll('.page').forEach(page => page.style.display = 'none');
-      document.getElementById(pageId).style.display = 'block';
+      $('.page').hide();
+      $('#' + pageId).fadeIn(300, function() {
+          $(this).css("pointer-events", "auto");
+      });
     }
 
     // --------- Auth0 Integration -----------
@@ -418,8 +469,6 @@
           clientId: config.clientId,
           redirect_uri: window.location.origin,
           cacheLocation: "localstorage"
-          // Uncomment and set audience if you use a custom API:
-          // audience: "YOUR_API_IDENTIFIER"
         });
       } catch (err) {
         console.log("Error configuring Auth0 client:", err);
@@ -456,12 +505,10 @@
     const updateAuthUI = async () => {
       try {
         const isAuthenticated = await auth0Client.isAuthenticated();
-        console.log("updateAuthUI: isAuthenticated =", isAuthenticated);
         const loginBtn = document.getElementById("login-btn");
         const logoutBtn = document.getElementById("logout-btn");
         if (isAuthenticated) {
           userProfile = await auth0Client.getUser();
-          console.log("updateAuthUI: userProfile =", userProfile);
           loginBtn.style.display = "none";
           logoutBtn.style.display = "inline-block";
         } else {
@@ -476,11 +523,8 @@
     // --------- Attach Auth0 event listeners and process redirect callback -----------
     window.onload = async () => {
       await configureClient();
-      console.log("Auth0 client configured:", auth0Client);
-      // Enable the login button once Auth0 is ready.
       document.getElementById("login-btn").disabled = false;
       
-      // Process redirect callback if present.
       if (window.location.search.includes("code=") && window.location.search.includes("state=")) {
         try {
           await auth0Client.handleRedirectCallback();
@@ -492,42 +536,44 @@
         }
       }
       await updateAuthUI();
-      // Show page based on auth state.
       const isAuthenticated = await auth0Client.isAuthenticated();
       if (isAuthenticated) {
         showPage("page-upload");
       } else {
         showPage("page-welcome");
       }
+      
+      // Attach event listeners for auth buttons
+      document.getElementById("sign-in-btn").addEventListener("click", () => {
+        console.log("Sign In clicked");
+        login();
+      });
+      document.getElementById("create-account-btn").addEventListener("click", () => {
+        console.log("Create Account clicked");
+        login();
+      });
+      document.getElementById("login-btn").addEventListener("click", () => {
+        console.log("Login button clicked");
+        login();
+      });
+      document.getElementById("logout-btn").addEventListener("click", () => {
+        logout();
+      });
+      
+      // Attach event listener for "Chat with Bloo" button on the Upload Page
+      document.getElementById("chat-btn").addEventListener("click", () => {
+        showPage("page-chat");
+      });
     };
 
-    // Event listener for welcome page login button.
-    document.getElementById("welcome-login-btn").addEventListener("click", () => {
-      console.log("Welcome login button clicked");
-      login();
-    });
-
-    // Standard Auth0 buttons.
-    document.getElementById("login-btn").addEventListener("click", () => {
-      console.log("Login button clicked");
-      login();
-    });
-
-    document.getElementById("logout-btn").addEventListener("click", () => {
-      logout();
-    });
-
-    // --------- Skip Button on Upload Page -----------
     document.getElementById("skip-btn").addEventListener("click", () => {
       showPage("page-chat");
     });
 
-    // --------- Upload More Files Button on Chat Page -----------
     document.getElementById("back-to-upload-btn").addEventListener("click", () => {
       showPage("page-upload");
     });
 
-    // --------- Bloobot Chat and File Upload Logic -----------
     let conversation = [];
     const messagesEl = document.getElementById('messages');
     const promptEl = document.getElementById('prompt');
@@ -539,7 +585,11 @@
     function addMessage(text, sender) {
       const msgDiv = document.createElement('div');
       msgDiv.className = 'message ' + sender + ' mb-2';
-      msgDiv.textContent = text;
+      if(sender === "bot"){
+        msgDiv.innerHTML = "<img src='assets/bloobotlogoimage.png' alt='Bloo Logo' style='width:20px;height:20px;vertical-align:middle;margin-right:8px;'><strong>Bloo: </strong>" + text;
+      } else {
+        msgDiv.textContent = text;
+      }
       messagesEl.appendChild(msgDiv);
       messagesEl.scrollTop = messagesEl.scrollHeight;
     }
@@ -560,7 +610,7 @@
     function typeWriter(text, element, speed = 30) {
       let i = 0;
       const interval = setInterval(() => {
-        element.innerHTML = "<strong>Bloo: </strong>" + markdownToHTML(text.substring(0, i));
+        element.innerHTML = "<img src='assets/bloobotlogoimage.png' alt='Bloo Logo' style='width:20px;height:20px;vertical-align:middle;margin-right:8px;'><strong>Bloo: </strong>" + markdownToHTML(text.substring(0, i));
         i++;
         if (i > text.length) clearInterval(interval);
       }, speed);
@@ -578,12 +628,11 @@
         const elapsed = Date.now() - now;
         const expectedCount = Math.min(elapsed * wordsPerMillisecond, pieces.length);
         const segment = pieces.slice(0, expectedCount + 1).join('');
-        msgDiv.innerHTML = "<strong>Bloo: </strong>" + markdownToHTML(segment);
+        msgDiv.innerHTML = "<img src='assets/bloobotlogoimage.png' alt='Bloo Logo' style='width:20px;height:20px;vertical-align:middle;margin-right:8px;'><strong>Bloo: </strong>" + markdownToHTML(segment);
         if (expectedCount >= pieces.length) clearInterval(interval);
       }, 200);
     }
 
-    // Chat progress functions
     let progressInterval;
     function startProgress() {
       const progressContainer = document.getElementById('progressContainer');
@@ -615,7 +664,6 @@
       promptEl.value = '';
       startProgress();
       try {
-        // Determine user namespace from userProfile if available, otherwise default to "default"
         const ns = userProfile ? (userProfile.nickname || userProfile.name || userProfile.email) : "default";
         const response = await fetch(API_URL, {
           method: 'POST',
@@ -651,7 +699,6 @@
       });
     });
 
-    // File upload logic
     const dropZone = document.getElementById("drop-zone");
     const fileInput = document.getElementById("fileUpload");
 
@@ -702,7 +749,6 @@
       startUploadProgress();
       const files = Array.from(fileList);
       const uploads = files.map(file => uploadFile(file));
-      // Use Promise.allSettled so that if at least one file succeeds, we show success
       Promise.allSettled(uploads)
         .then((results) => {
           finishUploadProgress();
@@ -732,7 +778,6 @@
           if (xhr.status >= 200 && xhr.status < 300) {
             try {
               const result = JSON.parse(xhr.responseText);
-              console.log("Upload result for", file.name, ":", result);
               resolve(result);
             } catch (err) {
               reject(err);
@@ -752,13 +797,12 @@
       });
     }
     
-    // NEW: Function to update the file list UI in the drop zone
     function updateFileList(files) {
       const fileListContainer = document.getElementById("file-list");
       if (!fileListContainer) return;
       let html = "<ul class='list-group'>";
       files.forEach(file => {
-        html += `<li class="list-group-item bg-dark text-white"><span class="file-icon">📄</span>${file.name}</li>`;
+        html += `<li class="list-group-item bg-light text-dark"><span class="file-icon">📄</span>${file.name}</li>`;
       });
       html += "</ul>";
       fileListContainer.innerHTML = html;
@@ -767,8 +811,7 @@
 
   <script>
     window.addEventListener('DOMContentLoaded', () => {
-      // Assuming addMessage is defined and available in your scope.
-      addMessage("Hey there! What homework can I help you with today?", "bot");
+      addMessage("Ask a question", "bot");
     });
   </script>
   

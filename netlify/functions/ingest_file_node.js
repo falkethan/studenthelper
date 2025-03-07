@@ -124,8 +124,9 @@ function chunkText(fullText) {
 }
 
 // Function to generate embeddings and prepare vectors for upsert
-async function generateVectors(chunks, uniquePrefix) {
+async function generateVectors(chunks, uniquePrefix, filePath) {
   const vectors = [];
+  const filename = path.basename(filePath); // retrieve filename
   for (let i = 0; i < chunks.length; i++) {
     try {
       console.log(`Generating embedding for chunk ${i} (length: ${chunks[i].length})`);
@@ -137,7 +138,10 @@ async function generateVectors(chunks, uniquePrefix) {
       vectors.push({
         id: `${uniquePrefix}-chunk-${i}`,
         values: embedding,
-        metadata: { text: chunks[i] },
+        metadata: { 
+          text: chunks[i],
+          filename: filename  // add filename to metadata
+        },
       });
     } catch (error) {
       console.error(`Error processing chunk ${i}:`, error);
@@ -193,7 +197,7 @@ async function ingestFile(filePath, userNamespace) {
   
   const chunks = chunkText(fullText);
   const uniquePrefix = `${path.basename(filePath, path.extname(filePath))}-${Date.now()}`;
-  const vectors = await generateVectors(chunks, uniquePrefix);
+  const vectors = await generateVectors(chunks, uniquePrefix, filePath);
   await upsertVectors(vectors, namespace);
 }
 

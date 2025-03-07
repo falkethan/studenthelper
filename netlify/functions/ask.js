@@ -43,15 +43,30 @@ export async function handler(event, context) {
     const queryEmbedding = embeddingResponse.data.data[0].embedding;
     
     // Query Pinecone using the determined namespace.
-    // (Your updated pinecone.js should bind the namespace using index.namespace(userNamespace))
     const pineconeMatches = await queryCoursework(queryEmbedding, 5, currentNamespace);
     console.log("🔍 Pinecone Query Results:", pineconeMatches);
     
-    // If there are matches, include the coursework; otherwise, ask for clarification.
-    const courseworkContext = pineconeMatches.length
-      ? `\n\nRelevant coursework found:\n${pineconeMatches.map(match => `- ${match.metadata.text}`).join("\n")}`
-      : "\n\n[Note: Coursework data is still loading. Please specify which course you are referring to.]";
+   // Custom logic: Check if any match's metadata filename appears in the user's query.
+let customMessage = "";
+if (pineconeMatches.length > 0) {
+  const foundMatch = pineconeMatches.find(match => {
+    if (!match.metadata.filename) return false;
+    // Remove extension from the filename for a more flexible match
+    const baseFilename = match.metadata.filename.toLowerCase().replace(/\.[^/.]+$/, "");
+    return userQuery.toLowerCase().includes(baseFilename);
+  });
+  if (foundMatch) {
+    customMessage = `I found your document "${foundMatch.metadata.filename}". Here is a quick summary: ${foundMatch.metadata.text.slice(0, 300)}...\nCan I help you with anything else?`;
+  }
+}
+
     
+const courseworkContext = customMessage !== ""
+? customMessage
+: (pineconeMatches.length
+    ? `\n\nRelevant coursework found:\n${pineconeMatches.map(match => `- ${match.metadata.text}`).join("\n")}`
+    : "\n\n[Note: Coursework data is still loading. Please specify which course you are referring to.]");
+
     const messages = [
       {
         role: "system",
