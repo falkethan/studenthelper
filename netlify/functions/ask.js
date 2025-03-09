@@ -46,27 +46,46 @@ export async function handler(event, context) {
     const pineconeMatches = await queryCoursework(queryEmbedding, 5, currentNamespace);
     console.log("🔍 Pinecone Query Results:", pineconeMatches);
     
-   // Custom logic: Check if any match's metadata filename appears in the user's query.
-let customMessage = "";
-if (pineconeMatches.length > 0) {
-  const foundMatch = pineconeMatches.find(match => {
-    if (!match.metadata.filename) return false;
-    // Remove extension from the filename for a more flexible match
-    const baseFilename = match.metadata.filename.toLowerCase().replace(/\.[^/.]+$/, "");
-    return userQuery.toLowerCase().includes(baseFilename);
-  });
-  if (foundMatch) {
-    customMessage = `I found your document "${foundMatch.metadata.filename}". Here is a quick summary: ${foundMatch.metadata.text.slice(0, 300)}...\nCan I help you with anything else?`;
-  }
-}
-
+    // Additional retrieval step: Generate a detailed context summary from all retrieved coursework.
+    let detailedContext = "";
+    if (pineconeMatches.length > 0) {
+      // Combine all retrieved text from matches.
+      const combinedText = pineconeMatches.map(match => match.metadata.text).join("\n---\n");
+      
+      // Use OpenAI to generate a concise summary of the combined text.
+      const summarizationPrompt = `Summarize the following coursework content into a concise and coherent summary:\n\n${combinedText}`;
+      const summaryCompletion = await openai.createChatCompletion({
+        model: "gpt-4o-mini-2024-07-18",
+        messages: [{ role: "system", content: summarizationPrompt }],
+        temperature: 0.5,
+      });
+      detailedContext = summaryCompletion.data.choices[0].message.content;
+      console.log("Detailed context summary:", detailedContext);
+    }
     
-const courseworkContext = customMessage !== ""
-? customMessage
-: (pineconeMatches.length
-    ? `\n\nRelevant coursework found:\n${pineconeMatches.map(match => `- ${match.metadata.text}`).join("\n")}`
-    : "\n\n[Note: Coursework data is still loading. Please specify which course you are referring to.]");
-
+    // Custom logic: Check if any match's metadata filename appears in the user's query.
+    let customMessage = "";
+    if (pineconeMatches.length > 0) {
+      const foundMatch = pineconeMatches.find(match => {
+        if (!match.metadata.filename) return false;
+        // Remove extension from the filename for a more flexible match.
+        const baseFilename = match.metadata.filename.toLowerCase().replace(/\.[^/.]+$/, "");
+        return userQuery.toLowerCase().includes(baseFilename);
+      });
+      if (foundMatch) {
+        customMessage = `I found your document "${foundMatch.metadata.filename}". Here is a quick summary: ${foundMatch.metadata.text.slice(0, 300)}...\nCan I help you with anything else?`;
+      }
+    }
+    
+    // Build the coursework context using the custom message, detailed summary, or a fallback.
+    const courseworkContext = customMessage !== ""
+      ? customMessage
+      : (detailedContext !== ""
+          ? `\n\nDetailed retrieved coursework summary:\n${detailedContext}`
+          : (pineconeMatches.length
+              ? `\n\nRelevant coursework found:\n${pineconeMatches.map(match => `- ${match.metadata.text}`).join("\n")}`
+              : "\n\n[Note: Coursework data is still loading. Please specify which course you are referring to.]"));
+    
     const messages = [
       {
         role: "system",

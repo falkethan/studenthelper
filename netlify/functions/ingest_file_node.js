@@ -6,9 +6,12 @@ import mammoth from "mammoth";
 import PPTX2Json from "pptx2json"; // imported as a class
 import officeParser from "officeparser"; // fallback for PPTX extraction
 import XLSX from "xlsx"; // NEW: For parsing Excel files
+import Tesseract from "tesseract.js"; // NEW: For OCR on images
 import { Configuration, OpenAIApi } from "openai";
 import { Pinecone } from "@pinecone-database/pinecone";
 import dotenv from "dotenv";
+import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
+
 dotenv.config();
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
@@ -33,6 +36,16 @@ function determineNamespace(filePath) {
     return "FIN3270";
   }
   return DEFAULT_NAMESPACE;
+}
+
+async function chunkTextWithLangchain(fullText) {
+  const splitter = new RecursiveCharacterTextSplitter({
+    chunkSize: 1000,    // Adjust chunk size as needed
+    chunkOverlap: 100,  // Adjust overlap as needed
+  });
+  const chunks = await splitter.splitText(fullText);
+  console.log(`Langchain chunked text into ${chunks.length} chunks`);
+  return chunks;
 }
 
 // Extraction functions:
@@ -113,6 +126,24 @@ async function extractTextFromExcel(filePath) {
   return fullText;
 }
 
+// NEW: Extraction function for images (.jpg, .jpeg, .png)
+async function extractTextFromImage(filePath) {
+  console.log(`Extracting text from image: ${filePath}`);
+  try {
+    const { data: { text } } = await Tesseract.recognize(
+      filePath,
+      'eng', // adjust language if needed
+      { logger: m => console.log(m) }
+    );
+    console.log("Extracted image text length:", text.length);
+    console.log("Extracted image text preview:", text.slice(0, 200));
+    return text;
+  } catch (err) {
+    console.error("Error during OCR extraction:", err);
+    throw err;
+  }
+}
+
 // Simple chunking function – adjust as needed
 function chunkText(fullText) {
   const chunks = fullText
@@ -191,11 +222,19 @@ async function ingestFile(filePath, userNamespace) {
     fullText = await extractTextFromPPTX(filePath);
   } else if (ext === ".xlsx" || ext === ".xls") {
     fullText = await extractTextFromExcel(filePath);
+  } else if ([".jpg", ".jpeg", ".png"].includes(ext)) {
+    fullText = await extractTextFromImage(filePath);
   } else {
     throw new Error("Unsupported file type: " + ext);
   }
   
-  const chunks = chunkText(fullText);
+  let chunks = [];
+  try {
+    chunks = await chunkTextWithLangchain(fullText);
+  } catch (err) {
+    console.error("Error using Langchain chunking, falling back to simple chunking", err);
+    chunks = chunkText(fullText);
+  }
   const uniquePrefix = `${path.basename(filePath, path.extname(filePath))}-${Date.now()}`;
   const vectors = await generateVectors(chunks, uniquePrefix, filePath);
   await upsertVectors(vectors, namespace);
