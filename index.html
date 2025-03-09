@@ -396,7 +396,7 @@
  <!-- ========================================= -->
 <!-- PAGE 0: Landing Page (Funnel Layout) -->
 <!-- ========================================= -->
-<div id="page-landing" class="page" style="min-height: 100vh; background: url('/assets/website-background-2.png') no-repeat center center; background-size: cover;">
+<div id="page-landing" class="page" style="min-height: 100vh; background: #ffffff no-repeat center center; background-size: cover;">
   <!-- Hero Section -->
   <section class="hero-section">
     <div class="container">
@@ -410,37 +410,159 @@
       <button id="landing-get-started-btn" class="btn btn-primary btn-lg">Get Started</button>
     </div>
   </section>
-  <!-- Features Section -->
-  <section class="features-section">
-    <div class="container">
-      <div class="row text-center">
-        <div class="col-md-4 mb-4">
-          <img src="assets/files-icon.png" alt="Analyze Files" style="width:60px;" />
-          <h3>Analyze Your Files</h3>
-          <p>
-            Bloobot quickly ingests your PDFs, Word docs, PowerPoints, Excel files, and images
-            to provide coursework specific answers and deeper insights into your coursework.
-          </p>
-        </div>
-        <div class="col-md-4 mb-4">
-          <img src="assets/homework-icon.png" alt="Homework Guidance" style="width:60px;" />
-          <h3>Homework Guidance</h3>
-          <p>
-            Struggling with assignments? Let Bloobot break down complex tasks into
-            simpler steps and walk you through each stage for better understanding.
-          </p>
-        </div>
-        <div class="col-md-4 mb-4">
-          <img src="assets/study-tips-icon.png" alt="Study Tips" style="width:60px;" />
-          <h3>Study Tips &amp; More</h3>
-          <p>
-            From interactive Q&amp;A to personalized study recommendations, Bloobot
-            helps you focus on the topics that matter most.
-          </p>
+
+  <!-- How Bloobot Works Section (Numbered Phones + Corresponding Icons) -->
+<section class="how-bloobot-works" style="
+background: linear-gradient(135deg, #ffffff, #f7f9fa);
+padding: 60px 0;
+border-radius: 12px;
+box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+margin: 40px 0;
+position: relative;
+">
+<div class="container">
+  <div class="row align-items-center">
+    <!-- Left Side: Numbered Phone Mockups -->
+    <div class="col-md-6 d-flex justify-content-center justify-content-md-start" style="position: relative;">
+      
+      <!-- Phone 1 with Number -->
+      <div style="position: relative; margin-right: 20px;">
+        <img 
+          src="assets/phone-example-1.png" 
+          alt="Bloo on Mobile 1" 
+          style="
+            width: 210px; 
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+          "
+        >
+        <!-- Number Badge for Phone 1 -->
+        <div style="
+          position: absolute;
+          top: -10px; 
+          left: -10px;
+          background: #0d6efd; 
+          color: #fff; 
+          padding: 8px 12px; 
+          border-radius: 8px; 
+          font-weight: bold; 
+          font-size: 1.2rem;
+        ">
+          1
         </div>
       </div>
+
+      <!-- Phone 2 with Number -->
+      <div style="position: relative;">
+        <img 
+          src="assets/phone-example-2.png" 
+          alt="Bloo on Mobile 2" 
+          style="
+            width: 210px; 
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+          "
+        >
+        <!-- Number Badge for Phone 2 -->
+        <div style="
+          position: absolute;
+          top: -10px; 
+          left: -10px;
+          background: #0d6efd; 
+          color: #fff; 
+          padding: 8px 12px; 
+          border-radius: 8px; 
+          font-weight: bold; 
+          font-size: 1.2rem;
+        ">
+          2
+        </div>
+      </div>
+
     </div>
-  </section>
+
+    <!-- Right Side: Steps with Corresponding Icons in Elevated Boxes -->
+<div class="col-md-6 text-start mt-4 mt-md-0">
+  <h2 style="font-weight: 600; font-size: 2rem;">How Bloobot Works</h2>
+  <p style="font-size: 1rem; margin-top: 10px; color: #555;">
+    Quick and easy steps to get the most out of Bloo:
+  </p>
+  <ol style="font-size: 18px; margin-top: 20px; line-height: 1.8; color: #333; list-style-type: none; padding-left: 0;">
+    <li style="margin-bottom: 15px;">
+      <div style="
+        background: #fff;
+        padding: 15px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        display: flex;
+        align-items: center;
+      ">
+        <img src="assets/1-intro.png" alt="Step 1 Icon" style="width: 40px; height: 40px; margin-right: 10px;">
+        <div>
+          <strong>Upload Coursework:</strong> Provide your PDFs, Word docs, PowerPoints, Excel files, or images for Bloo to analyze.
+        </div>
+      </div>
+    </li>
+    <li>
+      <div style="
+        background: #fff;
+        padding: 15px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        display: flex;
+        align-items: center;
+      ">
+        <img src="assets/2-intro.png" alt="Step 2 Icon" style="width: 40px; height: 40px; margin-right: 10px;">
+        <div>
+          <strong>Chat with Bloo:</strong> Ask questions and get step-by-step guidance tailored to your course content.
+        </div>
+      </div>
+    </li>
+  </ol>
+</div>
+
+</section>
+
+
+  <!-- Features Section with 3D Effect -->
+<section class="features-section" style="
+background-color: #f5f5f5; 
+box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); 
+border-radius: 12px; 
+padding: 40px 0; 
+margin: 40px 0;
+">
+<div class="container">
+  <div class="row text-center">
+    <div class="col-md-4 mb-4">
+      <img src="assets/files-icon.png" alt="Analyze Files" style="width:60px;" />
+      <h3>Analyze Your Files</h3>
+      <p>
+        Bloobot quickly ingests your PDFs, Word docs, PowerPoints, Excel files, and images
+        to provide coursework-specific answers and deeper insights into your coursework.
+      </p>
+    </div>
+    <div class="col-md-4 mb-4">
+      <img src="assets/homework-icon.png" alt="Homework Guidance" style="width:60px;" />
+      <h3>Homework Guidance</h3>
+      <p>
+        Struggling with assignments? Let Bloobot break down complex tasks into
+        simpler steps and walk you through each stage for better understanding.
+      </p>
+    </div>
+    <div class="col-md-4 mb-4">
+      <img src="assets/study-tips-icon.png" alt="Study Tips" style="width:60px;" />
+      <h3>Study Tips &amp; More</h3>
+      <p>
+        From interactive Q&amp;A to personalized study recommendations, Bloobot
+        helps you focus on the topics that matter most.
+      </p>
+    </div>
+  </div>
+</div>
+</section>
+
+
   <!-- Already Signed In Banner -->
   <section id="signed-in-banner" style="display: none; background: rgba(255,255,255,0.8); padding: 15px 0; text-align: center; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd;">
     <p style="margin: 0; font-size: 16px;">
@@ -448,6 +570,7 @@
       <a href="/chat.html" class="btn btn-link" style="font-size: 16px; text-decoration: underline;">Use Bloo</a>
     </p>
   </section>
+
   <!-- CTA Section -->
   <section class="cta-section" style="cursor: pointer; transition: transform 0.3s ease, box-shadow 0.3s ease; border-radius: 12px;">
     <div class="container">
@@ -481,8 +604,15 @@
 
 <!-- END of PAGE 0: Landing Page -->
 
-  <!-- Page 1: Welcome Screen (Two-Column Layout) -->
-<div id="page-welcome" class="page" style="min-height: 100vh; background: url('/assets/website-background-2.png') no-repeat center center; background-size: cover;">
+
+ <!-- Page 1: Welcome Screen (Two-Column Layout) -->
+<div id="page-welcome" class="page" style="min-height: 100vh; background: #f8f9fa; position: relative;">
+  <!-- Modern Back Button positioned at the top left -->
+  <button id="back-to-landing-btn" class="btn btn-outline-primary btn-modern-back" 
+    style="position: absolute; top: 20px; left: 20px;" 
+    onclick="window.location.href='index.html';">
+    &larr; Back to Home
+  </button>
   <div class="container py-5">
     <div class="row align-items-center">
       <!-- Left Column: Info Box -->
@@ -549,7 +679,6 @@
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
   }
 </style>
-
 
 <!-- New Page: Next Steps for Bloo -->
 <div id="page-info" class="page">
@@ -671,10 +800,24 @@
             <img src="assets/send-icon.png" alt="Send" style="width: 24px; height: 24px; display: block;">
           </button>
         </div>
-        <div class="text-center" style="margin-top: 20px;">
-          <button id="back-to-upload-btn" class="btn btn-secondary">Upload More Files</button>
-        </div>
       </div>
+     <!-- Elevated "Upload More Files" Button below the chatbox -->
+<div class="text-center" style="margin-top: 20px;">
+  <button id="back-to-upload-btn" class="btn" style="
+    background: linear-gradient(135deg, #0d6efd, #4285f4);
+    color: #fff;
+    border: none;
+    border-radius: 25px;
+    padding: 12px 24px;
+    font-size: 16px;
+    font-weight: 500;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 12px rgba(0, 0, 0, 0.15)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 8px rgba(0, 0, 0, 0.1)'">
+    Upload More Files
+  </button>
+</div>
+      
       <!-- RIGHT COLUMN: Feature Boxes (vertical) -->
       <div class="feature-cards" style="order: 2; flex: 1; display: flex; flex-direction: column; gap: 20px;">
         <!-- Feature Block 1: Course Material Analysis -->
@@ -1210,15 +1353,19 @@
   })();
 </script>
 
-<script>
-  if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => {
-      navigator.serviceWorker
-        .register("/service-worker.js")
-        .then(() => console.log("Service Worker registered!"))
-        .catch(err => console.error("Service Worker registration failed:", err));
-    });
-  }
+  <script>
+    // Only register the service worker if not running on localhost
+    if (window.location.hostname !== 'localhost' && 'serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/service-worker.js')
+        .then((registration) => {
+          console.log("Service worker registered: ", registration);
+        })
+        .catch((error) => {
+          console.error("Service worker registration failed: ", error);
+        });
+    } else {
+      console.log("Service worker not registered in development (localhost).");
+    }
   </script>
   
 </body>
