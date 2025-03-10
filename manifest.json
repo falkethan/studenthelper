@@ -1,13 +1,18 @@
 {
   "short_name": "Bloo",
-  "name": "Bloo - Your Academic Assistant",
-"start_url": "/index.html?v=1234",
+  "name": "Bloo - Your Personal Education AI",
+  "start_url": "/index.html?v=5678",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#ffffff",
+  "background_color": "#121212",
+  "theme_color": "#121212",
   "icons": [
     {
-      "src": "assets/bloobotlogo.png",
+      "src": "images/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "images/icon-512.png",
       "sizes": "512x512",
       "type": "image/png"
     }
