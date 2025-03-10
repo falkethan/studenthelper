@@ -11,7 +11,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Bloo - Your Personal Education AI</title>
-  <link rel="manifest" href="/manifest.json?v=1234">
+  <link rel="manifest" href="/manifest.json?v=5678">
   <!-- Load Fonts and Bootstrap -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" 
@@ -744,40 +744,49 @@ margin: 40px 0;
 
 <!-- Page 2: Upload Screen --> 
 <div id="page-upload" class="page">
-  <div class="container text-center position-relative">
-    <!-- Modern Back Button positioned in the top left -->
-    <button id="back-to-info-btn" class="btn btn-outline-primary btn-modern-back position-absolute start-0 top-0 m-3">&larr; Back</button>
-    <div id="drop-zone" class="dropzone-container mx-auto">
-      <!-- Modernized Upload UI: Inline SVG Icon -->
-      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="#007bff" class="bi bi-cloud-upload" viewBox="0 0 16 16">
+  <div class="container position-relative" style="max-width: 800px; margin-top: 2rem;">
+    <!-- Modern Back Button positioned in the top left using an inline SVG icon -->
+    <button id="back-to-info-btn" class="btn btn-light position-absolute" style="top: 1rem; left: 1rem; border: none; background: transparent; cursor: pointer;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="#007bff" viewBox="0 0 16 16">
+        <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L6.707 7l4.647 4.646a.5.5 0 0 1-.708.708l-5-5a.5.5 0 0 1 0-.708l5-5a.5.5 0 0 1 .708 0z"/>
+      </svg>
+    </button>
+    <!-- Card-like Upload Area -->
+    <div id="drop-zone" class="dropzone-container mx-auto" style="border: 2px dashed #007bff; border-radius: 12px; padding: 2rem; text-align: center; box-shadow: 0 4px 8px rgba(0,0,0,0.1); transition: background 0.3s ease;">
+      <!-- Inline SVG Icon -->
+      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="#007bff" class="bi bi-cloud-upload mb-3" viewBox="0 0 16 16">
         <path d="M4.406 8.342a5.53 5.53 0 0 1 9.188-1.342A3.5 3.5 0 0 1 15.5 8a3.5 3.5 0 0 1-1.032 2.342A4.5 4.5 0 0 1 8 13.5a4.5 4.5 0 0 1-4.468-3.158zM8 0a5 5 0 0 0-4.546 2.914A3.5 3.5 0 0 0 1.5 7a3.5 3.5 0 0 0 1.032 2.342A4.5 4.5 0 0 0 8 13.5a4.5 4.5 0 0 0 4.468-3.158A3.5 3.5 0 0 0 14.5 7a3.5 3.5 0 0 0-1.032-2.342A5 5 0 0 0 8 0zm.5 8V5h-1v3H5l3 3 3-3h-2.5z"/>
       </svg>
-      <p>Drag &amp; drop your files here, or click to select</p>
+      <p style="font-size: 1.1rem; color: #333;">Drag &amp; drop your coursework here, or click to select</p>
       <!-- Full-size transparent file input for click functionality -->
-      <input type="file" id="fileUpload" accept=".pdf,.pptx,.docx,.xlsx,.png,.jpg,.jpeg" multiple>
-      <div class="supported-formats">
+      <input type="file" id="fileUpload" accept=".pdf,.pptx,.docx,.xlsx,.png,.jpg,.jpeg" multiple style="position: absolute; inset: 0; width: 100%; opacity: 0; cursor: pointer;">
+      
+      <!-- Supported Formats -->
+      <div class="supported-formats mt-3" style="font-size: 0.9rem; color: #666;">
         <p>Supported documents:</p>
-        <ul class="list-inline">
-          <li class="list-inline-item"><img src="assets/pdf-logo.png" alt="PDF"> .pdf</li>
-          <li class="list-inline-item"><img src="assets/docx-logo.png" alt="DOCX"> .docx</li>
-          <li class="list-inline-item"><img src="assets/pptx-logo.png" alt="PPTX"> .pptx</li>
-          <li class="list-inline-item"><img src="assets/excel-logo.png" alt="Excel"> .xlsx</li>
-          <li class="list-inline-item"><img src="assets/image-logo.png" alt="Image"> .png, .jpg, .jpeg</li>
+        <ul class="list-inline" style="padding-left: 0; margin: 0;">
+          <li class="list-inline-item mx-1"><img src="assets/pdf-logo.png" alt="PDF" style="width:24px;"> .pdf</li>
+          <li class="list-inline-item mx-1"><img src="assets/docx-logo.png" alt="DOCX" style="width:24px;"> .docx</li>
+          <li class="list-inline-item mx-1"><img src="assets/pptx-logo.png" alt="PPTX" style="width:24px;"> .pptx</li>
+          <li class="list-inline-item mx-1"><img src="assets/excel-logo.png" alt="Excel" style="width:24px;"> .xlsx</li>
+          <li class="list-inline-item mx-1"><img src="assets/image-logo.png" alt="Image" style="width:24px;"> .png, .jpg, .jpeg</li>
         </ul>
       </div>
       <!-- File Upload History -->
       <div id="file-list" style="margin-top: 20px; text-align: left;">
-        <h5>Uploaded Files:</h5>
-        <ul id="uploaded-files" style="list-style-type: none; padding-left: 0;"></ul>
+        <h5>Uploaded Coursework:</h5>
+        <ul id="uploaded-files" style="list-style: none; padding-left: 0;"></ul>
       </div>
     </div>
-    <div class="text-center mt-3">
-      <button id="chat-btn" class="btn btn-primary">Chat with Bloo</button>
+    <!-- Action Buttons -->
+    <div class="text-center mt-4">
+      <button id="chat-btn" class="btn btn-primary px-4 py-2" style="font-size: 1.1rem;">Chat with Bloo</button>
       <br>
-      <button id="skip-btn" class="btn btn-secondary mt-2">Skip to Chat</button>
+      <button id="skip-btn" class="btn btn-secondary mt-2 px-4 py-2" style="font-size: 1rem;">Skip to Chat</button>
     </div>
   </div>
 </div>
+
 
  <!-- Page 3: Chat Screen -->
 <div id="page-chat" class="page">
@@ -1365,6 +1374,18 @@ margin: 40px 0;
         });
     } else {
       console.log("Service worker not registered in development (localhost).");
+    }
+  </script>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/service-worker.js?v=2')
+        .then(registration => {
+          console.log('Service Worker registered!', registration.scope);
+        })
+        .catch(error => {
+          console.error('Service Worker registration failed:', error);
+        });
     }
   </script>
   
