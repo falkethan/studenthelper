@@ -1,6 +1,6 @@
 [build]
   publish = "."
-  
+
 [dev]
   publish = "."
 
@@ -8,13 +8,7 @@
   node_bundler = "esbuild"
   external_node_modules = [
     "openai",
-    "pdf-parse",
-    "mammoth",
-    "pptx2json",
-    "officeparser",
-    "xlsx",
-    "tesseract.js",
-    "langchain"
+    "pdf-parse"
   ]
   included_files = [
     "netlify/functions/*",
@@ -23,3 +17,8 @@
 
 [functions."ask"]
   timeout = 26
+
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
