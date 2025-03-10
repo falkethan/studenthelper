@@ -5,8 +5,8 @@ import pdfParse from "pdf-parse";
 import mammoth from "mammoth";
 import PPTX2Json from "pptx2json"; // imported as a class
 import officeParser from "officeparser"; // fallback for PPTX extraction
-import XLSX from "xlsx"; // NEW: For parsing Excel files
-import Tesseract from "tesseract.js"; // NEW: For OCR on images
+import XLSX from "xlsx"; // For parsing Excel files
+import Tesseract from "tesseract.js"; // For OCR on images
 import { Configuration, OpenAIApi } from "openai";
 import { Pinecone } from "@pinecone-database/pinecone";
 import dotenv from "dotenv";
@@ -108,14 +108,12 @@ async function extractTextFromPPTX(filePath) {
   return text;
 }
 
-// NEW: Extraction function for Excel files (.xlsx and .xls)
+// Extraction function for Excel files (.xlsx and .xls)
 async function extractTextFromExcel(filePath) {
   console.log(`Extracting text from Excel: ${filePath}`);
   const dataBuffer = fs.readFileSync(filePath);
-  // Read the workbook from the file buffer
   const workbook = XLSX.read(dataBuffer, { type: "buffer" });
   let fullText = "";
-  // Iterate through each sheet and convert it to CSV text
   workbook.SheetNames.forEach(sheetName => {
     const worksheet = workbook.Sheets[sheetName];
     const sheetText = XLSX.utils.sheet_to_csv(worksheet);
@@ -126,7 +124,7 @@ async function extractTextFromExcel(filePath) {
   return fullText;
 }
 
-// NEW: Extraction function for images (.jpg, .jpeg, .png)
+// Extraction function for images (.jpg, .jpeg, .png)
 async function extractTextFromImage(filePath) {
   console.log(`Extracting text from image: ${filePath}`);
   try {
@@ -157,7 +155,7 @@ function chunkText(fullText) {
 // Function to generate embeddings and prepare vectors for upsert
 async function generateVectors(chunks, uniquePrefix, filePath) {
   const vectors = [];
-  const filename = path.basename(filePath); // retrieve filename
+  const filename = path.basename(filePath);
   for (let i = 0; i < chunks.length; i++) {
     try {
       console.log(`Generating embedding for chunk ${i} (length: ${chunks[i].length})`);
@@ -171,7 +169,7 @@ async function generateVectors(chunks, uniquePrefix, filePath) {
         values: embedding,
         metadata: { 
           text: chunks[i],
-          filename: filename  // add filename to metadata
+          filename: filename
         },
       });
     } catch (error) {
@@ -198,35 +196,35 @@ async function upsertVectors(vectors, namespaceId) {
   }
 }
 
-// Main function to ingest file; now accepts an optional userNamespace
-async function ingestFile(filePath, userNamespace) {
-  console.log("Ingesting file:", filePath);
-  if (!fs.existsSync(filePath)) {
-    throw new Error(`File not found at path: ${filePath}`);
-  }
-  // Use the provided namespace if available; otherwise determine from the file path.
-  const namespace = userNamespace || determineNamespace(filePath);
-  console.log("Using namespace:", namespace);
-  
-  const ext = path.extname(filePath).toLowerCase();
+// Main function to ingest a file; now accepts an optional userNamespace
+async function ingestFile(inputPath, userNamespace) {
+  console.log("Ingesting input:", inputPath);
   let fullText = "";
-  
+  // For file paths, ensure the file exists
+  if (!fs.existsSync(inputPath)) {
+    throw new Error(`File not found at path: ${inputPath}`);
+  }
+  const ext = path.extname(inputPath).toLowerCase();
   if (ext === ".pdf") {
-    fullText = await extractTextFromPDF(filePath);
+    fullText = await extractTextFromPDF(inputPath);
     console.log("Extracted PDF text length:", fullText.length);
     console.log("Extracted PDF text preview:", fullText.slice(0, 200));
   } else if (ext === ".docx") {
-    fullText = await extractTextFromDOCX(filePath);
+    fullText = await extractTextFromDOCX(inputPath);
     console.log("Extracted DOCX text length:", fullText.length);
   } else if (ext === ".pptx") {
-    fullText = await extractTextFromPPTX(filePath);
+    fullText = await extractTextFromPPTX(inputPath);
   } else if (ext === ".xlsx" || ext === ".xls") {
-    fullText = await extractTextFromExcel(filePath);
+    fullText = await extractTextFromExcel(inputPath);
   } else if ([".jpg", ".jpeg", ".png"].includes(ext)) {
-    fullText = await extractTextFromImage(filePath);
+    fullText = await extractTextFromImage(inputPath);
   } else {
     throw new Error("Unsupported file type: " + ext);
   }
+
+  // Use the provided namespace if available; otherwise determine from the input path.
+  const namespace = userNamespace || determineNamespace(inputPath);
+  console.log("Using namespace:", namespace);
   
   let chunks = [];
   try {
@@ -235,10 +233,35 @@ async function ingestFile(filePath, userNamespace) {
     console.error("Error using Langchain chunking, falling back to simple chunking", err);
     chunks = chunkText(fullText);
   }
-  const uniquePrefix = `${path.basename(filePath, path.extname(filePath))}-${Date.now()}`;
-  const vectors = await generateVectors(chunks, uniquePrefix, filePath);
+  const uniquePrefix = `${path.basename(inputPath, path.extname(inputPath))}-${Date.now()}`;
+  const vectors = await generateVectors(chunks, uniquePrefix, inputPath);
   await upsertVectors(vectors, namespace);
 }
 
 // Export the main function
 export { ingestFile };
+
+// Lambda handler for Netlify
+export async function handler(event, context) {
+  try {
+    // Extract the logged-in user's unique identifier.
+    // This example assumes Netlify Identity is configured and provides userContext.
+    const userNamespace = event.userContext && event.userContext.user && event.userContext.user.sub
+      ? event.userContext.user.sub
+      : "default"; // fallback namespace if no user is logged in
+
+    const { inputPath } = JSON.parse(event.body);
+    console.log("Using namespace (auto-assigned):", userNamespace);
+    await ingestFile(inputPath, userNamespace);
+    return {
+      statusCode: 200,
+      body: JSON.stringify({ success: true })
+    };
+  } catch (error) {
+    console.error("Error in handler:", error);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: error.message })
+    };
+  }
+}

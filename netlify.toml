@@ -8,11 +8,13 @@
   node_bundler = "esbuild"
   external_node_modules = [
     "openai",
-    "pdf-parse"
+    "pdf-parse",
+    "jsdom"
   ]
   included_files = [
     "netlify/functions/*",
-    "node_modules/pdf-parse/**/*"
+    "node_modules/pdf-parse/**/*",
+    "node_modules/jsdom/**/*"
   ]
 
 [functions."ask"]
