@@ -7,7 +7,6 @@ import PPTX2Json from "pptx2json"; // imported as a class
 import officeParser from "officeparser"; // fallback for PPTX extraction
 import XLSX from "xlsx"; // For parsing Excel files
 import Tesseract from "tesseract.js"; // For OCR on images
-import sharp from "sharp"; // Added to convert HEIC/HEIF images
 import { Configuration, OpenAIApi } from "openai";
 import { Pinecone } from "@pinecone-database/pinecone";
 import dotenv from "dotenv";
@@ -109,7 +108,6 @@ async function extractTextFromPPTX(filePath) {
   return text;
 }
 
-// Extraction function for Excel files (.xlsx and .xls)
 async function extractTextFromExcel(filePath) {
   console.log(`Extracting text from Excel: ${filePath}`);
   const dataBuffer = fs.readFileSync(filePath);
@@ -126,7 +124,7 @@ async function extractTextFromExcel(filePath) {
 }
 
 // Extraction function for images (.jpg, .jpeg, .png, .heic, .heif)
-// If the file is HEIC/HEIF, it is converted to PNG first.
+// For HEIC/HEIF, sharp is dynamically imported and used to convert to PNG.
 async function extractTextFromImage(filePath) {
   console.log(`Extracting text from image: ${filePath}`);
   try {
@@ -154,7 +152,6 @@ function chunkText(fullText) {
   return chunks;
 }
 
-// Function to generate embeddings and prepare vectors for upsert
 async function generateVectors(chunks, uniquePrefix, filePath) {
   const vectors = [];
   const filename = path.basename(filePath);
@@ -182,7 +179,6 @@ async function generateVectors(chunks, uniquePrefix, filePath) {
   return vectors;
 }
 
-// Function to upsert vectors into Pinecone with the provided namespace.
 async function upsertVectors(vectors, namespaceId) {
   if (vectors.length > 0) {
     const nsRef = index.namespace(namespaceId);
@@ -198,11 +194,9 @@ async function upsertVectors(vectors, namespaceId) {
   }
 }
 
-// Main function to ingest a file; now accepts an optional userNamespace
 async function ingestFile(inputPath, userNamespace) {
   console.log("Ingesting input:", inputPath);
   let fullText = "";
-  // For file paths, ensure the file exists
   if (!fs.existsSync(inputPath)) {
     throw new Error(`File not found at path: ${inputPath}`);
   }
@@ -219,8 +213,9 @@ async function ingestFile(inputPath, userNamespace) {
   } else if (ext === ".xlsx" || ext === ".xls") {
     fullText = await extractTextFromExcel(inputPath);
   } else if ([".jpg", ".jpeg", ".png", ".heic", ".heif"].includes(ext)) {
-    // If the file is HEIC/HEIF, convert it to PNG before OCR
     if (ext === ".heic" || ext === ".heif") {
+      // Dynamically import sharp for HEIC/HEIF conversion
+      const { default: sharp } = await import("sharp");
       const tempPath = inputPath + ".png";
       console.log(`Converting HEIC/HEIF image ${inputPath} to PNG format.`);
       await sharp(inputPath).png().toFile(tempPath);
@@ -233,7 +228,6 @@ async function ingestFile(inputPath, userNamespace) {
     throw new Error("Unsupported file type: " + ext);
   }
 
-  // Use the provided namespace if available; otherwise determine from the input path.
   const namespace = userNamespace || determineNamespace(inputPath);
   console.log("Using namespace:", namespace);
   
@@ -249,18 +243,13 @@ async function ingestFile(inputPath, userNamespace) {
   await upsertVectors(vectors, namespace);
 }
 
-// Export the main function
 export { ingestFile };
 
-// Lambda handler for Netlify
 export async function handler(event, context) {
   try {
-    // Extract the logged-in user's unique identifier.
-    // This example assumes Netlify Identity is configured and provides userContext.
     const userNamespace = event.userContext && event.userContext.user && event.userContext.user.sub
       ? event.userContext.user.sub
-      : "default"; // fallback namespace if no user is logged in
-
+      : "default";
     const { inputPath } = JSON.parse(event.body);
     console.log("Using namespace (auto-assigned):", userNamespace);
     await ingestFile(inputPath, userNamespace);
