@@ -7,6 +7,7 @@ import PPTX2Json from "pptx2json"; // imported as a class
 import officeParser from "officeparser"; // fallback for PPTX extraction
 import XLSX from "xlsx"; // For parsing Excel files
 import Tesseract from "tesseract.js"; // For OCR on images
+import sharp from "sharp"; // Added to convert HEIC/HEIF images
 import { Configuration, OpenAIApi } from "openai";
 import { Pinecone } from "@pinecone-database/pinecone";
 import dotenv from "dotenv";
@@ -124,7 +125,8 @@ async function extractTextFromExcel(filePath) {
   return fullText;
 }
 
-// Extraction function for images (.jpg, .jpeg, .png)
+// Extraction function for images (.jpg, .jpeg, .png, .heic, .heif)
+// If the file is HEIC/HEIF, it is converted to PNG first.
 async function extractTextFromImage(filePath) {
   console.log(`Extracting text from image: ${filePath}`);
   try {
@@ -216,8 +218,17 @@ async function ingestFile(inputPath, userNamespace) {
     fullText = await extractTextFromPPTX(inputPath);
   } else if (ext === ".xlsx" || ext === ".xls") {
     fullText = await extractTextFromExcel(inputPath);
-  } else if ([".jpg", ".jpeg", ".png"].includes(ext)) {
-    fullText = await extractTextFromImage(inputPath);
+  } else if ([".jpg", ".jpeg", ".png", ".heic", ".heif"].includes(ext)) {
+    // If the file is HEIC/HEIF, convert it to PNG before OCR
+    if (ext === ".heic" || ext === ".heif") {
+      const tempPath = inputPath + ".png";
+      console.log(`Converting HEIC/HEIF image ${inputPath} to PNG format.`);
+      await sharp(inputPath).png().toFile(tempPath);
+      fullText = await extractTextFromImage(tempPath);
+      fs.unlinkSync(tempPath);
+    } else {
+      fullText = await extractTextFromImage(inputPath);
+    }
   } else {
     throw new Error("Unsupported file type: " + ext);
   }
