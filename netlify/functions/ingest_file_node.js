@@ -197,9 +197,46 @@ async function upsertVectors(vectors, namespaceId) {
 async function ingestFile(inputPath, userNamespace) {
   console.log("Ingesting input:", inputPath);
   let fullText = "";
+
+  // If file does not exist on disk, check if inputPath is a base64 data URL.
   if (!fs.existsSync(inputPath)) {
-    throw new Error(`File not found at path: ${inputPath}`);
+    if (inputPath.startsWith("data:")) {
+      // Expected format: data:[mime];base64,[data]
+      const matches = inputPath.match(/^data:(.+);base64,(.+)$/);
+      if (matches) {
+        const mime = matches[1];
+        let ext = "";
+        if (mime.includes("pdf")) {
+          ext = ".pdf";
+        } else if (mime.includes("word")) {
+          ext = ".docx";
+        } else if (mime.includes("powerpoint")) {
+          ext = ".pptx";
+        } else if (mime.includes("excel")) {
+          ext = ".xlsx";
+        } else if (mime.includes("jpeg")) {
+          ext = ".jpeg";
+        } else if (mime.includes("png")) {
+          ext = ".png";
+        } else if (mime.includes("heic") || mime.includes("heif")) {
+          ext = ".heic";
+        } else {
+          throw new Error("Unsupported MIME type: " + mime);
+        }
+        // Write to temporary file in /tmp directory.
+        const tempPath = `/tmp/upload-${Date.now()}${ext}`;
+        const buffer = Buffer.from(matches[2], "base64");
+        fs.writeFileSync(tempPath, buffer);
+        console.log(`Wrote base64 file to temporary path: ${tempPath}`);
+        inputPath = tempPath;
+      } else {
+        throw new Error("Invalid data URL format");
+      }
+    } else {
+      throw new Error(`File not found at path: ${inputPath}`);
+    }
   }
+
   const ext = path.extname(inputPath).toLowerCase();
   if (ext === ".pdf") {
     fullText = await extractTextFromPDF(inputPath);
