@@ -4,18 +4,20 @@
 [dev]
   publish = "."
 
-[functions]
-  node_bundler = "esbuild"
-  external_node_modules = [
-    "openai",
-    "pdf-parse",
-    "jsdom"
-  ]
-  included_files = [
-    "netlify/functions/*",
-    "node_modules/pdf-parse/**/*",
-    "node_modules/jsdom/**/*"
-  ]
+[functions."*"]
+included_files = ["netlify/functions/*", "node_modules/pdf-parse/**/*"]
+external_node_modules = [
+  "openai", 
+  "pdf-parse", 
+  "mammoth", 
+  "pptx2json", 
+  "officeparser", 
+  "xlsx", 
+  "tesseract.js", 
+  "tesseract.js/dist/worker.min.js", 
+  "langchain"
+]
+node_bundler = "esbuild"
 
 [functions."ask"]
   timeout = 26

@@ -125,6 +125,8 @@ async function extractTextFromExcel(filePath) {
 
 // Extraction function for images (.jpg, .jpeg, .png, .heic, .heif)
 // For HEIC/HEIF, sharp is dynamically imported and used to convert to PNG.
+import { createWorker } from 'tesseract.js';
+
 async function extractTextFromImage(filePath) {
   console.log(`Extracting text from image: ${filePath}`);
   try {
@@ -141,6 +143,7 @@ async function extractTextFromImage(filePath) {
     throw err;
   }
 }
+
 
 // Simple chunking function – adjust as needed
 function chunkText(fullText) {
@@ -197,46 +200,10 @@ async function upsertVectors(vectors, namespaceId) {
 async function ingestFile(inputPath, userNamespace) {
   console.log("Ingesting input:", inputPath);
   let fullText = "";
-
-  // If file does not exist on disk, check if inputPath is a base64 data URL.
+  // For file paths, ensure the file exists
   if (!fs.existsSync(inputPath)) {
-    if (inputPath.startsWith("data:")) {
-      // Expected format: data:[mime];base64,[data]
-      const matches = inputPath.match(/^data:(.+);base64,(.+)$/);
-      if (matches) {
-        const mime = matches[1];
-        let ext = "";
-        if (mime.includes("pdf")) {
-          ext = ".pdf";
-        } else if (mime.includes("word")) {
-          ext = ".docx";
-        } else if (mime.includes("powerpoint")) {
-          ext = ".pptx";
-        } else if (mime.includes("excel")) {
-          ext = ".xlsx";
-        } else if (mime.includes("jpeg")) {
-          ext = ".jpeg";
-        } else if (mime.includes("png")) {
-          ext = ".png";
-        } else if (mime.includes("heic") || mime.includes("heif")) {
-          ext = ".heic";
-        } else {
-          throw new Error("Unsupported MIME type: " + mime);
-        }
-        // Write to temporary file in /tmp directory.
-        const tempPath = `/tmp/upload-${Date.now()}${ext}`;
-        const buffer = Buffer.from(matches[2], "base64");
-        fs.writeFileSync(tempPath, buffer);
-        console.log(`Wrote base64 file to temporary path: ${tempPath}`);
-        inputPath = tempPath;
-      } else {
-        throw new Error("Invalid data URL format");
-      }
-    } else {
-      throw new Error(`File not found at path: ${inputPath}`);
-    }
+    throw new Error(`File not found at path: ${inputPath}`);
   }
-
   const ext = path.extname(inputPath).toLowerCase();
   if (ext === ".pdf") {
     fullText = await extractTextFromPDF(inputPath);
@@ -284,9 +251,12 @@ export { ingestFile };
 
 export async function handler(event, context) {
   try {
+    // Extract the logged-in user's unique identifier.
+    // This example assumes Netlify Identity is configured and provides userContext.
     const userNamespace = event.userContext && event.userContext.user && event.userContext.user.sub
       ? event.userContext.user.sub
-      : "default";
+      : "default"; // fallback namespace if no user is logged in
+
     const { inputPath } = JSON.parse(event.body);
     console.log("Using namespace (auto-assigned):", userNamespace);
     await ingestFile(inputPath, userNamespace);
