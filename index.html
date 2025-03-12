@@ -877,9 +877,7 @@
                 </div>
               </div>
               <div id="initial-session-btn" style="text-align: right; margin-bottom: 15px;">
-                <button class="new-session-btn btn" style="padding: 4px 8px; border-radius: 3px; background: transparent; color: #007bff; border: 1px solid #007bff; font-size: 0.8rem;">
-                  New Homework Question
-                </button>
+                
               </div>
             </div>
           </div>
@@ -1053,286 +1051,280 @@
 </div>
 
 <script>
-document.addEventListener("DOMContentLoaded", function() {
-  // Global conversation state
-  var conversation = [];
-  var API_URL = window.location.hostname === "localhost" ? "http://localhost:8888/.netlify/functions/ask" : "/.netlify/functions/ask";
-  
-  // References to key elements
-  var messagesDiv = document.getElementById('messages');
-  // Reference the inner messages container
-  var messagesContent = document.getElementById('messages-content');
-  var promptEl = document.getElementById('prompt');
-  var sendBtn = document.getElementById('send');
-  var newHomeworkInput = document.getElementById('new-homework-input');
-  var newHomeworkAsk = document.getElementById('new-homework-ask');
-  
-  // Modal references
-  var sessionModal = document.getElementById('session-modal');
-  var modalYesBtn = document.getElementById('modal-yes');
-  var modalContinueBtn = document.getElementById('modal-continue');
-  var thinkingIndicator = document.getElementById('thinking-indicator');
-  
-  // Global spinner overlay element for new homework queries
-  var spinnerOverlay = null;
-  
-  // ---- Spinner Overlay Functions ----
-  function showSpinnerOverlay() {
-    var overlay = document.createElement('div');
-    overlay.id = "spinner-overlay";
-    overlay.style.position = "absolute";
-    overlay.style.top = "0";
-    overlay.style.left = "0";
-    overlay.style.width = "100%";
-    overlay.style.height = "100%";
-    overlay.style.background = "rgba(255,255,255,0.8)";
-    overlay.style.display = "flex";
-    overlay.style.alignItems = "center";
-    overlay.style.justifyContent = "center";
-    overlay.style.zIndex = "10";
-    var spinnerImg = document.createElement('img');
-    spinnerImg.src = "assets/infinite-spinner.svg";
-    spinnerImg.alt = "Loading...";
-    spinnerImg.style.width = "50px";
-    spinnerImg.style.height = "50px";
-    overlay.appendChild(spinnerImg);
-    // Append overlay to the outer messages container (so it isn't blurred)
-    messagesDiv.appendChild(overlay);
-    // Apply blur to only the inner messages content
-    messagesContent.style.filter = "blur(4px)";
-    return overlay;
-  }
-  
-  function hideSpinnerOverlay() {
-    var overlay = document.getElementById("spinner-overlay");
-    if (overlay) {
-      overlay.remove();
+  document.addEventListener("DOMContentLoaded", function() {
+    // Global conversation state and API URL
+    var conversation = [];
+    var API_URL = window.location.hostname === "localhost" ? "http://localhost:8888/.netlify/functions/ask" : "/.netlify/functions/ask";
+    
+    // References to key elements
+    var messagesDiv = document.getElementById('messages');
+    var messagesContent = document.getElementById('messages-content'); // inner container for messages
+    var promptEl = document.getElementById('prompt');
+    var sendBtn = document.getElementById('send');
+    var newHomeworkInput = document.getElementById('new-homework-input');
+    var newHomeworkAsk = document.getElementById('new-homework-ask');
+    
+    // Modal references
+    var sessionModal = document.getElementById('session-modal');
+    var modalYesBtn = document.getElementById('modal-yes');
+    var modalContinueBtn = document.getElementById('modal-continue');
+    var thinkingIndicator = document.getElementById('thinking-indicator');
+    
+    // Global spinner overlay element for new homework queries
+    var spinnerOverlay = null;
+    
+    // ---- Spinner Overlay Functions ----
+    function showSpinnerOverlay() {
+      var overlay = document.createElement('div');
+      overlay.id = "spinner-overlay";
+      overlay.style.position = "absolute";
+      overlay.style.top = "0";
+      overlay.style.left = "0";
+      overlay.style.width = "100%";
+      overlay.style.height = "100%";
+      overlay.style.background = "rgba(255,255,255,0.8)";
+      overlay.style.display = "flex";
+      overlay.style.alignItems = "center";
+      overlay.style.justifyContent = "center";
+      overlay.style.zIndex = "10";
+      var spinnerImg = document.createElement('img');
+      spinnerImg.src = "assets/infinite-spinner.svg";
+      spinnerImg.alt = "Loading...";
+      spinnerImg.style.width = "50px";
+      spinnerImg.style.height = "50px";
+      overlay.appendChild(spinnerImg);
+      // Append overlay to the outer messages container (so it stays above the blurred content)
+      messagesDiv.appendChild(overlay);
+      // Apply blur to the inner messages content only
+      messagesContent.style.filter = "blur(4px)";
+      return overlay;
     }
-    messagesContent.style.filter = "none";
-    spinnerOverlay = null;
-  }
-  
-  // ---- Markdown and Typewriter Functions ----
-  function markdownToHTML(markdown) {
-    var output = markdown;
-    output = output.replace(/^###### (.*)$/gm, '<h6>$1</h6>');
-    output = output.replace(/^##### (.*)$/gm, '<h5>$1</h5>');
-    output = output.replace(/^#### (.*)$/gm, '<h4>$1</h4>');
-    output = output.replace(/^### (.*)$/gm, '<h3>$1</h3>');
-    output = output.replace(/^## (.*)$/gm, '<h2>$1</h2>');
-    output = output.replace(/^# (.*)$/gm, '<h1>$1</h1>');
-    output = output.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-    output = output.replace(/\*(.+?)\*/g, '<em>$1</em>');
-    output = output.replace(/(?:^|\n)[-+*]\s+(.*)/g, '\n<li>$1</li>');
-    output = output.replace(/((?:<li>.*<\/li>\n?)+)/g, '<ul>$1</ul>');
-    return output;
-  }
-  
-  function intoPieces(text) {
-    if (/^\s*$/.test(text)) return [text];
-    var pieces = text.match(/(\s*\S+\s*)/g);
-    return pieces || [];
-  }
-  
-  function addBotMessageWithFormattingAndTyping(text, wpm) {
-    var msgDiv = document.createElement('div');
-    msgDiv.className = 'message bloo-message';
-    msgDiv.style.display = 'flex';
-    msgDiv.style.alignItems = 'flex-start';
-    msgDiv.style.marginBottom = '15px';
-  
-    var avatar = document.createElement('img');
-    avatar.src = 'assets/bloobotlogoimage.png';
-    avatar.alt = 'Bloo';
-    avatar.style.width = '60px';
-    avatar.style.height = '60px';
-    avatar.style.marginRight = '10px';
-    avatar.style.borderRadius = '50%';
-  
-    var bubble = document.createElement('div');
-    bubble.style.background = '#e8f0ff';
-    bubble.style.borderRadius = '6px';
-    bubble.style.padding = '10px 15px';
-    bubble.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
-    bubble.style.maxWidth = '65%';
-  
-    var p = document.createElement('p');
-    p.style.margin = '0';
-    p.style.color = '#333';
-    bubble.appendChild(p);
-  
-    msgDiv.appendChild(avatar);
-    msgDiv.appendChild(bubble);
-    messagesContent.appendChild(msgDiv);
-  
-    // Append a minimal new session button after the bot message
-    messagesContent.appendChild(createNewSessionButton());
-    messagesDiv.scrollTop = messagesDiv.scrollHeight;
-  
-    var pieces = intoPieces(text);
-    var wordsPerMillisecond = wpm / 60000;
-    var now = Date.now();
-    var interval = setInterval(function() {
-      var elapsed = Date.now() - now;
-      var expectedCount = Math.min(elapsed * wordsPerMillisecond, pieces.length);
-      var segment = pieces.slice(0, expectedCount + 1).join('');
-      p.innerHTML = markdownToHTML(segment);
+    
+    function hideSpinnerOverlay() {
+      var overlay = document.getElementById("spinner-overlay");
+      if (overlay) {
+        overlay.remove();
+      }
+      messagesContent.style.filter = "none";
+      spinnerOverlay = null;
+    }
+    
+    // ---- Markdown and Typewriter Functions ----
+    function markdownToHTML(markdown) {
+      var output = markdown;
+      output = output.replace(/^###### (.*)$/gm, '<h6>$1</h6>');
+      output = output.replace(/^##### (.*)$/gm, '<h5>$1</h5>');
+      output = output.replace(/^#### (.*)$/gm, '<h4>$1</h4>');
+      output = output.replace(/^### (.*)$/gm, '<h3>$1</h3>');
+      output = output.replace(/^## (.*)$/gm, '<h2>$1</h2>');
+      output = output.replace(/^# (.*)$/gm, '<h1>$1</h1>');
+      output = output.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+      output = output.replace(/\*(.+?)\*/g, '<em>$1</em>');
+      output = output.replace(/(?:^|\n)[-+*]\s+(.*)/g, '\n<li>$1</li>');
+      output = output.replace(/((?:<li>.*<\/li>\n?)+)/g, '<ul>$1</ul>');
+      return output;
+    }
+    
+    function intoPieces(text) {
+      if (/^\s*$/.test(text)) return [text];
+      var pieces = text.match(/(\s*\S+\s*)/g);
+      return pieces || [];
+    }
+    
+    function addBotMessageWithFormattingAndTyping(text, wpm) {
+      var msgDiv = document.createElement('div');
+      msgDiv.className = 'message bloo-message';
+      msgDiv.style.display = 'flex';
+      msgDiv.style.alignItems = 'flex-start';
+      msgDiv.style.marginBottom = '15px';
+    
+      var avatar = document.createElement('img');
+      avatar.src = 'assets/bloobotlogoimage.png';
+      avatar.alt = 'Bloo';
+      avatar.style.width = '60px';
+      avatar.style.height = '60px';
+      avatar.style.marginRight = '10px';
+      avatar.style.borderRadius = '50%';
+    
+      var bubble = document.createElement('div');
+      bubble.style.background = '#e8f0ff';
+      bubble.style.borderRadius = '6px';
+      bubble.style.padding = '10px 15px';
+      bubble.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
+      bubble.style.maxWidth = '65%';
+    
+      var p = document.createElement('p');
+      p.style.margin = '0';
+      p.style.color = '#333';
+      bubble.appendChild(p);
+    
+      msgDiv.appendChild(avatar);
+      msgDiv.appendChild(bubble);
+      messagesContent.appendChild(msgDiv);
+    
+      // Scroll to bottom of outer container
       messagesDiv.scrollTop = messagesDiv.scrollHeight;
-      if (expectedCount >= pieces.length) clearInterval(interval);
-    }, 200);
-  }
-  
-  // Function to create a minimal "New Homework Question" button
-  function createNewSessionButton() {
-    var btnDiv = document.createElement('div');
-    btnDiv.style.textAlign = 'right';
-    btnDiv.style.marginBottom = '15px';
-    var btn = document.createElement('button');
-    btn.className = 'new-session-btn btn';
-    btn.style.cssText = "padding: 4px 8px; border-radius: 3px; background: transparent; color: #007bff; border: 1px solid #007bff; font-size: 0.8rem;";
-    btn.textContent = "New Homework Question";
-    btn.addEventListener('click', function() {
-      sessionModal.style.display = 'flex';
-    });
-    btnDiv.appendChild(btn);
-    return btnDiv;
-  }
-  
-  // Function to process a user query (sends query to backend)
-  async function processUserQuery(query, clearHistory) {
-    if (!query.trim()) return;
-    // If query comes from new-homework box, clear conversation and show spinner overlay
-    if (clearHistory) {
-      conversation = [];
-      messagesContent.innerHTML = '';
-      spinnerOverlay = showSpinnerOverlay();
+    
+      var pieces = intoPieces(text);
+      var wordsPerMillisecond = wpm / 60000;
+      var now = Date.now();
+      var interval = setInterval(function() {
+        var elapsed = Date.now() - now;
+        var expectedCount = Math.min(elapsed * wordsPerMillisecond, pieces.length);
+        var segment = pieces.slice(0, expectedCount + 1).join('');
+        p.innerHTML = markdownToHTML(segment);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        if (expectedCount >= pieces.length) clearInterval(interval);
+      }, 200);
     }
-    conversation.push({ role: 'user', content: query });
-    addMessage("You: " + query, 'user');
-    startProgress();
-    try {
-      var ns = "default"; // Replace with actual user namespace if available.
-      const response = await fetch(API_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ conversation: conversation, userNamespace: ns })
-      });
-      const data = await response.json();
-      if (data.response) {
-        conversation.push({ role: 'assistant', content: data.response });
-        addBotMessageWithFormattingAndTyping(data.response, 1000);
+    
+    // Function to add a plain message (for user messages) with auto-scroll
+    function addMessage(text, sender) {
+      var msgDiv = document.createElement('div');
+      msgDiv.className = 'message ' + sender;
+      if (sender === 'bot') {
+        msgDiv.innerHTML = "<img src='assets/bloobotlogoimage.png' alt='Bloo' style='width:20px;height:20px;vertical-align:middle;margin-right:8px;'><strong>Bloo: </strong>" + text;
       } else {
-        addMessage("Whoops, I didn't get that. Can you ask me again please?", 'bot');
+        msgDiv.textContent = text;
       }
-    } catch (err) {
-      console.error(err);
-      addMessage("Bloo: Error connecting to server.", 'bot');
-    } finally {
-      finishProgress();
+      messagesContent.appendChild(msgDiv);
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
     }
-  }
-  
-  // ---- Progress and Thinking Indicator Functions ----
-  function startProgress() {
-    var progressBar = document.getElementById('progressBar');
-    progressBar.style.width = '50%';
-    // For regular queries (when spinnerOverlay isn't set), show the thinking text
-    if (!spinnerOverlay) {
-      thinkingIndicator.style.display = 'block';
+    
+    // ---- Function to Clear Chat History Completely ----
+    function clearChatHistory() {
+      conversation = [];
+      // Clear the entire outer messages container
+      messagesDiv.innerHTML = '';
+      // Recreate the inner messages container and update global reference
+      var newContent = document.createElement('div');
+      newContent.id = 'messages-content';
+      messagesDiv.appendChild(newContent);
+      messagesContent = newContent;
     }
-  }
-  
-  function finishProgress() {
-    var progressBar = document.getElementById('progressBar');
-    progressBar.style.width = '100%';
-    setTimeout(function() { 
-      progressBar.style.width = '0%'; 
-      thinkingIndicator.style.display = 'none';
-      if (spinnerOverlay) {
-         hideSpinnerOverlay();
+    
+    // ---- Function to Process a User Query ----
+    async function processUserQuery(query, clearHistory) {
+      if (!query.trim()) return;
+      // If clearHistory is true, clear chat before processing
+      if (clearHistory) {
+        clearChatHistory();
+        spinnerOverlay = showSpinnerOverlay();
       }
-    }, 500);
-  }
-  
-  // ---- Event Listeners ----
-  
-  // Main chat send button event
-  sendBtn.addEventListener('click', function() {
-    var query = promptEl.value;
-    promptEl.value = '';
-    promptEl.style.height = 'auto';
-    processUserQuery(query, false);
-  });
-  
-  promptEl.addEventListener('keydown', function(e) {
-    if(e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      sendBtn.click();
+      conversation.push({ role: 'user', content: query });
+      addMessage("You: " + query, 'user');
+      startProgress();
+      try {
+        var ns = "default"; // Replace with actual user namespace if available.
+        const response = await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ conversation: conversation, userNamespace: ns })
+        });
+        const data = await response.json();
+        if (data.response) {
+          conversation.push({ role: 'assistant', content: data.response });
+          addBotMessageWithFormattingAndTyping(data.response, 1000);
+        } else {
+          addMessage("Whoops, I didn't get that. Can you ask me again please?", 'bot');
+        }
+      } catch (err) {
+        console.error(err);
+        addMessage("Bloo: Error connecting to server.", 'bot');
+      } finally {
+        finishProgress();
+      }
+    }
+    
+    // ---- Progress and Thinking Indicator Functions ----
+    function startProgress() {
+      var progressBar = document.getElementById('progressBar');
+      progressBar.style.width = '50%';
+      if (!spinnerOverlay) {
+        thinkingIndicator.style.display = 'block';
+      }
+    }
+    
+    function finishProgress() {
+      var progressBar = document.getElementById('progressBar');
+      progressBar.style.width = '100%';
+      setTimeout(function() { 
+        progressBar.style.width = '0%'; 
+        thinkingIndicator.style.display = 'none';
+        if (spinnerOverlay) {
+           hideSpinnerOverlay();
+        }
+      }, 500);
+    }
+    
+    // ---- Event Listeners ----
+    
+    // Main chat send button event (for the original chat input)
+    sendBtn.addEventListener('click', function() {
+      var query = promptEl.value;
+      promptEl.value = '';
+      promptEl.style.height = 'auto';
+      processUserQuery(query, false);
+    });
+    
+    promptEl.addEventListener('keydown', function(e) {
+      if(e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendBtn.click();
+      }
+    });
+    
+    // New Homework Query Box: Enter key support
+    newHomeworkInput.addEventListener('keydown', function(e) {
+      if(e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        newHomeworkAsk.click();
+      }
+    });
+    
+    // New Homework Query Box: Ask button event; automatically clear history and show spinner overlay
+    newHomeworkAsk.addEventListener('click', function() {
+      var query = newHomeworkInput.value;
+      newHomeworkInput.value = '';
+      processUserQuery(query, true);
+    });
+    
+    // Modal "Yes" button: clear conversation and reset chat with initial greeting
+    modalYesBtn.addEventListener('click', function() {
+      clearChatHistory();
+      var initialMsg = document.createElement('div');
+      initialMsg.className = 'message bloo-message';
+      initialMsg.style.cssText = "display: flex; align-items: flex-start; margin-bottom: 15px;";
+      initialMsg.innerHTML = `
+        <img src="assets/bloobotlogoimage.png" alt="Bloo" style="width: 60px; height: 60px; margin-right: 10px; border-radius: 50%;">
+        <div style="background: #e8f0ff; border-radius: 6px; padding: 10px 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); max-width: 65%;">
+          <p style="margin: 0; color: #333;">Hi, I'm Bloo! I am an expert in your homework. How can I help?</p>
+        </div>`;
+      messagesContent.appendChild(initialMsg);
+      // Optionally, you may add a new session button here if desired.
+      sessionModal.style.display = 'none';
+    });
+    
+    // Modal "Continue" button: simply close the modal
+    modalContinueBtn.addEventListener('click', function() {
+      sessionModal.style.display = 'none';
+    });
+    
+    // Function to add a plain message (for user messages) with auto-scroll
+    function addMessage(text, sender) {
+      var msgDiv = document.createElement('div');
+      msgDiv.className = 'message ' + sender;
+      if(sender === 'bot'){
+        msgDiv.innerHTML = "<img src='assets/bloobotlogoimage.png' alt='Bloo' style='width:20px;height:20px;vertical-align:middle;margin-right:8px;'><strong>Bloo: </strong>" + text;
+      } else {
+        msgDiv.textContent = text;
+      }
+      messagesContent.appendChild(msgDiv);
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
     }
   });
+  </script>
   
-  // New Homework Query Box: Enter key support
-  newHomeworkInput.addEventListener('keydown', function(e) {
-    if(e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      newHomeworkAsk.click();
-    }
-  });
-  
-  // New Homework Query Box: Ask button event; automatically clear history and show spinner overlay
-  newHomeworkAsk.addEventListener('click', function() {
-    var query = newHomeworkInput.value;
-    newHomeworkInput.value = '';
-    processUserQuery(query, true);
-  });
-  
- // Modal "Yes" button: clear conversation and reset chat with initial greeting and new session button
-modalYesBtn.addEventListener('click', function() {
-  conversation = [];
-  // Clear the entire outer messages container
-  messagesDiv.innerHTML = '';
-  // Recreate the inner messages container and update the global reference
-  var newContent = document.createElement('div');
-  newContent.id = 'messages-content';
-  messagesDiv.appendChild(newContent);
-  messagesContent = newContent; // Update the global variable so new messages append here
-  
-  // Insert the initial bot greeting into the new inner container
-  var initialMsg = document.createElement('div');
-  initialMsg.className = 'message bloo-message';
-  initialMsg.style.cssText = "display: flex; align-items: flex-start; margin-bottom: 15px;";
-  initialMsg.innerHTML = `
-    <img src="assets/bloobotlogoimage.png" alt="Bloo" style="width: 60px; height: 60px; margin-right: 10px; border-radius: 50%;">
-    <div style="background: #e8f0ff; border-radius: 6px; padding: 10px 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); max-width: 65%;">
-      <p style="margin: 0; color: #333;">Hi, I'm Bloo! I am an expert in your homework. How can I help?</p>
-    </div>`;
-  messagesContent.appendChild(initialMsg);
-  messagesContent.appendChild(createNewSessionButton());
-  
-  sessionModal.style.display = 'none';
-});
-
-  
-  // Modal "Continue" button: simply close the modal
-  modalContinueBtn.addEventListener('click', function() {
-    sessionModal.style.display = 'none';
-  });
-  
-  // Function to add a plain message (for user messages) with auto-scroll
-  function addMessage(text, sender) {
-    var msgDiv = document.createElement('div');
-    msgDiv.className = 'message ' + sender;
-    if(sender === 'bot'){
-      msgDiv.innerHTML = "<img src='assets/bloobotlogoimage.png' alt='Bloo' style='width:20px;height:20px;vertical-align:middle;margin-right:8px;'><strong>Bloo: </strong>" + text;
-    } else {
-      msgDiv.textContent = text;
-    }
-    messagesContent.appendChild(msgDiv);
-    messagesDiv.scrollTop = messagesDiv.scrollHeight;
-  }
-});
-</script>
-
 
 
 <!-- Loading Overlay for file uploads -->
