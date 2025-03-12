@@ -1,17 +1,9 @@
+//gpt-4o-mini-2024-07-18
 // netlify/functions/ask.js
 import fs from "fs";
 import path from "path";
 import { Configuration, OpenAIApi } from "openai";
 import { queryCoursework } from "./pinecone.js";
-
-// Load scraped finance data (if available)
-const financeDataPath = path.join(process.cwd(), "netlify/functions/scraped_finance_data.json");
-let financeData = [];
-if (fs.existsSync(financeDataPath)) {
-  financeData = JSON.parse(fs.readFileSync(financeDataPath, "utf-8"));
-} else {
-  console.error("⚠️ scraped finance data not found!");
-}
 
 export async function handler(event, context) {
   try {
@@ -86,14 +78,66 @@ export async function handler(event, context) {
               ? `\n\nRelevant coursework found:\n${pineconeMatches.map(match => `- ${match.metadata.text}`).join("\n")}`
               : "\n\n[Note: Coursework data is still loading. Please specify which course you are referring to.]"));
     
+ // --- NEW WEB SEARCH INTEGRATION ---
+// Decide whether to trigger a web search based on the user's query.
+let webContext = "";
+let shouldSearchWeb = false;
+const lowerQuery = userQuery.toLowerCase();
+
+// Check if query contains a URL
+const urlRegex = /(https?:\/\/[^\s]+)/;
+const urlMatch = userQuery.match(urlRegex);
+if (urlMatch) {
+  shouldSearchWeb = true;
+} else {
+  // Check for keywords that indicate a need for external info.
+  const webSearchKeywords = [
+    "latest", "news", "current", "update",
+    "find sources", "support", "evidence", "search the web"
+  ];
+  if (webSearchKeywords.some(keyword => lowerQuery.includes(keyword))) {
+    shouldSearchWeb = true;
+  }
+}
+
+if (shouldSearchWeb) {
+  console.log("Web search triggered for query:", userQuery);
+  
+  // If a URL is present, extract it and use a specialized prompt.
+  let webSearchPrompt = "";
+  if (urlMatch) {
+    const extractedUrl = urlMatch[0];
+    webSearchPrompt = `You are a web search tool that retrieves and summarizes content from public websites.
+Fetch and summarize the content of the following URL:
+${extractedUrl}`;
+  } else {
+    // Otherwise, build a generic prompt for external sources.
+    webSearchPrompt = `Using available web search capabilities, find and summarize relevant external sources for the following query: "${userQuery}"`;
+  }
+  
+  // Simulate a web search call (in production, use the dedicated tool interface).
+  const webSearchCompletion = await openai.createChatCompletion({
+    model: "gpt-4o-mini-2024-07-18",
+    messages: [{ role: "system", content: webSearchPrompt }],
+    temperature: 0.5,
+  });
+  webContext = webSearchCompletion.data.choices[0].message.content;
+  console.log("Web search summary:", webContext);
+}
+
+    // Combine coursework context with web search context (if available).
+const finalContext = courseworkContext + (webContext ? `\n\nExternal sources summary:\n${webContext}` : "");
+
+    
+    // Build final messages for the chat completion.
     const messages = [
       {
         role: "system",
         content: `
           You are Bloo, a highly specialized AI academic assistant with access to course-specific content.
           When answering questions, first refer to the relevant coursework retrieved below.
-          If the coursework does not answer the question, then use your general knowledge.
-          ${courseworkContext}
+          If the coursework does not fully answer the question, then use your general knowledge.
+          ${finalContext}
         `,
       },
       ...conversation,

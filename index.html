@@ -827,13 +827,19 @@
   </div>
 </div>
 
- <!-- Page 3: Chat Screen -->
+<!-- Page 3: Chat Screen -->
 <div id="page-chat" class="page" style="background: #f8f9fa; padding: 20px 0; font-family: 'Roboto', sans-serif;">
   <div class="container">
     <div class="main-container" style="display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap;">
       
-      <!-- LEFT COLUMN: Chat Column (Chat Container + Upload Button) -->
-      <div style="flex: 3; display: flex; flex-direction: column;">
+      <!-- LEFT COLUMN: Chat Column & New Homework Query Box -->
+      <div style="flex: 3; display: flex; flex-direction: column; gap: 20px;">
+        <!-- New Homework Query Box (Alternate method to ask a question) -->
+        <div id="new-homework-box" style="display: flex; gap: 10px; align-items: center; padding: 10px; background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+          <input id="new-homework-input" type="text" placeholder="Type a homework question..." style="flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.95rem;">
+          <button id="new-homework-ask" class="btn" style="padding: 8px 12px; border-radius: 4px; background: #007bff; color: #fff; border: none; font-size: 0.9rem;">Ask</button>
+        </div>
+        
         <!-- Chat Container -->
         <div class="chat-container" style="
           min-height: 600px;
@@ -847,56 +853,47 @@
         ">
           <!-- Chat Header: Centered Logo -->
           <div class="chat-header" style="text-align: center; margin-bottom: 20px;">
-            <img src="assets/bloobotblacktextcompressed.png"
-                 alt="Bloobot"
-                 style="max-width: 200px; width: 100%; height: auto; max-height: 80px;">
+            <img src="assets/bloobotblacktextcompressed.png" alt="Bloobot" style="max-width: 200px; width: 100%; height: auto; max-height: 80px;">
           </div>
           
-          <!-- Messages Area -->
+          <!-- Messages Area (Outer Container) -->
           <div class="messages mb-3" id="messages" style="
-          height: 500px;
-          overflow-y: auto;
-          background: #fafafa;
-          border: 1px solid #e0e0e0;
-          border-radius: 8px;
-          padding: 15px;
-          box-shadow: inset 0 2px 4px rgba(0,0,0,0.03);
-        ">
-        
-        
-            <!-- Example Bloo message with a bigger logo/avatar -->
-            <div class="message bloo-message" style="
-              display: flex;
-              align-items: flex-start;
-              margin-bottom: 15px;
-            ">
-              <!-- Bloo's Larger Logo/Avatar -->
-              <img src="assets/bloobotlogoimage.png"
-                   alt="Bloo"
-                   style="width: 60px; height: 60px; margin-right: 10px; border-radius: 50%;">
-              
-              <!-- Message Bubble -->
-              <div style="
-                background: #e8f0ff;
-                border-radius: 6px;
-                padding: 10px 15px;
-                box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-                max-width: 65%;
-              ">
-                <p style="margin: 0; color: #333;">
-                  Hi, I'm Bloo! I am an expert in your homework. How can I help?
-                </p>
+            position: relative;
+            height: 500px;
+            overflow-y: auto;
+            background: #fafafa;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.03);
+          ">
+            <!-- Inner Container for messages (this will be blurred) -->
+            <div id="messages-content">
+              <!-- Initial Bot Message with New Session Button -->
+              <div class="message bloo-message" style="display: flex; align-items: flex-start; margin-bottom: 15px;">
+                <img src="assets/bloobotlogoimage.png" alt="Bloo" style="width: 60px; height: 60px; margin-right: 10px; border-radius: 50%;">
+                <div style="background: #e8f0ff; border-radius: 6px; padding: 10px 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); max-width: 65%;">
+                  <p style="margin: 0; color: #333;">Hi, I'm Bloo! I am an expert in your homework. How can I help?</p>
+                </div>
+              </div>
+              <div id="initial-session-btn" style="text-align: right; margin-bottom: 15px;">
+                <button class="new-session-btn btn" style="padding: 4px 8px; border-radius: 3px; background: transparent; color: #007bff; border: 1px solid #007bff; font-size: 0.8rem;">
+                  New Homework Question
+                </button>
               </div>
             </div>
-            <!-- (You can dynamically append more messages here in JS) -->
           </div>
           
-          <!-- Progress Bar -->
-          <div id="progressContainer" style="margin-bottom: 10px;">
+          <!-- Progress Bar & Thinking Indicator -->
+          <div id="progressContainer" style="margin-bottom: 10px; position: relative;">
             <div id="progressBar" style="width: 0%; height: 4px; background: #007bff; border-radius: 2px;"></div>
+            <!-- Thinking indicator (for regular queries) -->
+            <div id="thinking-indicator" style="display: none; font-style: italic; color: #555; margin-top: 5px;">
+              Bloo is thinking...
+            </div>
           </div>
           
-          <!-- Chat Input -->
+          <!-- Chat Input (Main Chat Input) -->
           <div class="chat-input-container" style="
             display: flex;
             align-items: center;
@@ -925,7 +922,7 @@
           </div>
         </div>
         
-        <!-- Elevated "Upload More Files" Button (right below the chat box) -->
+        <!-- Elevated "Upload More Files" Button -->
         <div class="text-center" style="margin-top: 20px;">
           <button id="back-to-upload-btn" class="btn" style="
             background: linear-gradient(135deg, #0d6efd, #4285f4);
@@ -935,9 +932,9 @@
             padding: 12px 24px;
             font-size: 16px;
             font-weight: 500;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
-          " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 12px rgba(0, 0, 0, 0.15)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 8px rgba(0, 0, 0, 0.1)'">
+          " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 12px rgba(0,0,0,0.15)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 8px rgba(0,0,0,0.1)'">
             Upload More Files
           </button>
         </div>
@@ -1009,6 +1006,334 @@
   </div>
 </div>
 
+<!-- Custom Modal for New Homework Session Confirmation -->
+<div id="session-modal" style="
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  z-index: 10000;
+  align-items: center;
+  justify-content: center;
+">
+  <div id="modal-content" style="
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 90%;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    text-align: center;
+  ">
+    <p style="font-size: 1rem; color: #333; margin-bottom: 20px;">
+      Ask a new homework question? This will clear the current conversation.
+    </p>
+    <div>
+      <button id="modal-yes" class="btn" style="
+        margin-right: 10px;
+        padding: 8px 16px;
+        border-radius: 5px;
+        background: #160054;
+        color: #fff;
+        border: none;
+        font-size: 0.9rem;
+      ">Yes, ask new question</button>
+      <button id="modal-continue" class="btn" style="
+        padding: 8px 16px;
+        border-radius: 5px;
+        background: #28a745;
+        color: #fff;
+        border: none;
+        font-size: 0.9rem;
+      ">Continue current question</button>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  // Global conversation state
+  var conversation = [];
+  var API_URL = window.location.hostname === "localhost" ? "http://localhost:8888/.netlify/functions/ask" : "/.netlify/functions/ask";
+  
+  // References to key elements
+  var messagesDiv = document.getElementById('messages');
+  // Reference the inner messages container
+  var messagesContent = document.getElementById('messages-content');
+  var promptEl = document.getElementById('prompt');
+  var sendBtn = document.getElementById('send');
+  var newHomeworkInput = document.getElementById('new-homework-input');
+  var newHomeworkAsk = document.getElementById('new-homework-ask');
+  
+  // Modal references
+  var sessionModal = document.getElementById('session-modal');
+  var modalYesBtn = document.getElementById('modal-yes');
+  var modalContinueBtn = document.getElementById('modal-continue');
+  var thinkingIndicator = document.getElementById('thinking-indicator');
+  
+  // Global spinner overlay element for new homework queries
+  var spinnerOverlay = null;
+  
+  // ---- Spinner Overlay Functions ----
+  function showSpinnerOverlay() {
+    var overlay = document.createElement('div');
+    overlay.id = "spinner-overlay";
+    overlay.style.position = "absolute";
+    overlay.style.top = "0";
+    overlay.style.left = "0";
+    overlay.style.width = "100%";
+    overlay.style.height = "100%";
+    overlay.style.background = "rgba(255,255,255,0.8)";
+    overlay.style.display = "flex";
+    overlay.style.alignItems = "center";
+    overlay.style.justifyContent = "center";
+    overlay.style.zIndex = "10";
+    var spinnerImg = document.createElement('img');
+    spinnerImg.src = "assets/infinite-spinner.svg";
+    spinnerImg.alt = "Loading...";
+    spinnerImg.style.width = "50px";
+    spinnerImg.style.height = "50px";
+    overlay.appendChild(spinnerImg);
+    // Append overlay to the outer messages container (so it isn't blurred)
+    messagesDiv.appendChild(overlay);
+    // Apply blur to only the inner messages content
+    messagesContent.style.filter = "blur(4px)";
+    return overlay;
+  }
+  
+  function hideSpinnerOverlay() {
+    var overlay = document.getElementById("spinner-overlay");
+    if (overlay) {
+      overlay.remove();
+    }
+    messagesContent.style.filter = "none";
+    spinnerOverlay = null;
+  }
+  
+  // ---- Markdown and Typewriter Functions ----
+  function markdownToHTML(markdown) {
+    var output = markdown;
+    output = output.replace(/^###### (.*)$/gm, '<h6>$1</h6>');
+    output = output.replace(/^##### (.*)$/gm, '<h5>$1</h5>');
+    output = output.replace(/^#### (.*)$/gm, '<h4>$1</h4>');
+    output = output.replace(/^### (.*)$/gm, '<h3>$1</h3>');
+    output = output.replace(/^## (.*)$/gm, '<h2>$1</h2>');
+    output = output.replace(/^# (.*)$/gm, '<h1>$1</h1>');
+    output = output.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    output = output.replace(/\*(.+?)\*/g, '<em>$1</em>');
+    output = output.replace(/(?:^|\n)[-+*]\s+(.*)/g, '\n<li>$1</li>');
+    output = output.replace(/((?:<li>.*<\/li>\n?)+)/g, '<ul>$1</ul>');
+    return output;
+  }
+  
+  function intoPieces(text) {
+    if (/^\s*$/.test(text)) return [text];
+    var pieces = text.match(/(\s*\S+\s*)/g);
+    return pieces || [];
+  }
+  
+  function addBotMessageWithFormattingAndTyping(text, wpm) {
+    var msgDiv = document.createElement('div');
+    msgDiv.className = 'message bloo-message';
+    msgDiv.style.display = 'flex';
+    msgDiv.style.alignItems = 'flex-start';
+    msgDiv.style.marginBottom = '15px';
+  
+    var avatar = document.createElement('img');
+    avatar.src = 'assets/bloobotlogoimage.png';
+    avatar.alt = 'Bloo';
+    avatar.style.width = '60px';
+    avatar.style.height = '60px';
+    avatar.style.marginRight = '10px';
+    avatar.style.borderRadius = '50%';
+  
+    var bubble = document.createElement('div');
+    bubble.style.background = '#e8f0ff';
+    bubble.style.borderRadius = '6px';
+    bubble.style.padding = '10px 15px';
+    bubble.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
+    bubble.style.maxWidth = '65%';
+  
+    var p = document.createElement('p');
+    p.style.margin = '0';
+    p.style.color = '#333';
+    bubble.appendChild(p);
+  
+    msgDiv.appendChild(avatar);
+    msgDiv.appendChild(bubble);
+    messagesContent.appendChild(msgDiv);
+  
+    // Append a minimal new session button after the bot message
+    messagesContent.appendChild(createNewSessionButton());
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+  
+    var pieces = intoPieces(text);
+    var wordsPerMillisecond = wpm / 60000;
+    var now = Date.now();
+    var interval = setInterval(function() {
+      var elapsed = Date.now() - now;
+      var expectedCount = Math.min(elapsed * wordsPerMillisecond, pieces.length);
+      var segment = pieces.slice(0, expectedCount + 1).join('');
+      p.innerHTML = markdownToHTML(segment);
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+      if (expectedCount >= pieces.length) clearInterval(interval);
+    }, 200);
+  }
+  
+  // Function to create a minimal "New Homework Question" button
+  function createNewSessionButton() {
+    var btnDiv = document.createElement('div');
+    btnDiv.style.textAlign = 'right';
+    btnDiv.style.marginBottom = '15px';
+    var btn = document.createElement('button');
+    btn.className = 'new-session-btn btn';
+    btn.style.cssText = "padding: 4px 8px; border-radius: 3px; background: transparent; color: #007bff; border: 1px solid #007bff; font-size: 0.8rem;";
+    btn.textContent = "New Homework Question";
+    btn.addEventListener('click', function() {
+      sessionModal.style.display = 'flex';
+    });
+    btnDiv.appendChild(btn);
+    return btnDiv;
+  }
+  
+  // Function to process a user query (sends query to backend)
+  async function processUserQuery(query, clearHistory) {
+    if (!query.trim()) return;
+    // If query comes from new-homework box, clear conversation and show spinner overlay
+    if (clearHistory) {
+      conversation = [];
+      messagesContent.innerHTML = '';
+      spinnerOverlay = showSpinnerOverlay();
+    }
+    conversation.push({ role: 'user', content: query });
+    addMessage("You: " + query, 'user');
+    startProgress();
+    try {
+      var ns = "default"; // Replace with actual user namespace if available.
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ conversation: conversation, userNamespace: ns })
+      });
+      const data = await response.json();
+      if (data.response) {
+        conversation.push({ role: 'assistant', content: data.response });
+        addBotMessageWithFormattingAndTyping(data.response, 1000);
+      } else {
+        addMessage("Whoops, I didn't get that. Can you ask me again please?", 'bot');
+      }
+    } catch (err) {
+      console.error(err);
+      addMessage("Bloo: Error connecting to server.", 'bot');
+    } finally {
+      finishProgress();
+    }
+  }
+  
+  // ---- Progress and Thinking Indicator Functions ----
+  function startProgress() {
+    var progressBar = document.getElementById('progressBar');
+    progressBar.style.width = '50%';
+    // For regular queries (when spinnerOverlay isn't set), show the thinking text
+    if (!spinnerOverlay) {
+      thinkingIndicator.style.display = 'block';
+    }
+  }
+  
+  function finishProgress() {
+    var progressBar = document.getElementById('progressBar');
+    progressBar.style.width = '100%';
+    setTimeout(function() { 
+      progressBar.style.width = '0%'; 
+      thinkingIndicator.style.display = 'none';
+      if (spinnerOverlay) {
+         hideSpinnerOverlay();
+      }
+    }, 500);
+  }
+  
+  // ---- Event Listeners ----
+  
+  // Main chat send button event
+  sendBtn.addEventListener('click', function() {
+    var query = promptEl.value;
+    promptEl.value = '';
+    promptEl.style.height = 'auto';
+    processUserQuery(query, false);
+  });
+  
+  promptEl.addEventListener('keydown', function(e) {
+    if(e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendBtn.click();
+    }
+  });
+  
+  // New Homework Query Box: Enter key support
+  newHomeworkInput.addEventListener('keydown', function(e) {
+    if(e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      newHomeworkAsk.click();
+    }
+  });
+  
+  // New Homework Query Box: Ask button event; automatically clear history and show spinner overlay
+  newHomeworkAsk.addEventListener('click', function() {
+    var query = newHomeworkInput.value;
+    newHomeworkInput.value = '';
+    processUserQuery(query, true);
+  });
+  
+ // Modal "Yes" button: clear conversation and reset chat with initial greeting and new session button
+modalYesBtn.addEventListener('click', function() {
+  conversation = [];
+  // Clear the entire outer messages container
+  messagesDiv.innerHTML = '';
+  // Recreate the inner messages container and update the global reference
+  var newContent = document.createElement('div');
+  newContent.id = 'messages-content';
+  messagesDiv.appendChild(newContent);
+  messagesContent = newContent; // Update the global variable so new messages append here
+  
+  // Insert the initial bot greeting into the new inner container
+  var initialMsg = document.createElement('div');
+  initialMsg.className = 'message bloo-message';
+  initialMsg.style.cssText = "display: flex; align-items: flex-start; margin-bottom: 15px;";
+  initialMsg.innerHTML = `
+    <img src="assets/bloobotlogoimage.png" alt="Bloo" style="width: 60px; height: 60px; margin-right: 10px; border-radius: 50%;">
+    <div style="background: #e8f0ff; border-radius: 6px; padding: 10px 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); max-width: 65%;">
+      <p style="margin: 0; color: #333;">Hi, I'm Bloo! I am an expert in your homework. How can I help?</p>
+    </div>`;
+  messagesContent.appendChild(initialMsg);
+  messagesContent.appendChild(createNewSessionButton());
+  
+  sessionModal.style.display = 'none';
+});
+
+  
+  // Modal "Continue" button: simply close the modal
+  modalContinueBtn.addEventListener('click', function() {
+    sessionModal.style.display = 'none';
+  });
+  
+  // Function to add a plain message (for user messages) with auto-scroll
+  function addMessage(text, sender) {
+    var msgDiv = document.createElement('div');
+    msgDiv.className = 'message ' + sender;
+    if(sender === 'bot'){
+      msgDiv.innerHTML = "<img src='assets/bloobotlogoimage.png' alt='Bloo' style='width:20px;height:20px;vertical-align:middle;margin-right:8px;'><strong>Bloo: </strong>" + text;
+    } else {
+      msgDiv.textContent = text;
+    }
+    messagesContent.appendChild(msgDiv);
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+  }
+});
+</script>
+
+
 
 <!-- Loading Overlay for file uploads -->
 <div id="loading-overlay">
@@ -1017,24 +1342,6 @@
     <div id="upload-progress-bar"></div>
   </div>
 </div>
-
-
-<!-- Loading Overlay for file uploads -->
-<div id="loading-overlay">
-  <div class="spinner"></div>
-  <div id="upload-progress-container">
-    <div id="upload-progress-bar"></div>
-  </div>
-</div>
-
-<!-- Loading Overlay for file uploads -->
-<div id="loading-overlay">
-  <div class="spinner"></div>
-  <div id="upload-progress-container">
-    <div id="upload-progress-bar"></div>
-  </div>
-</div>
-
 
   <!-- Notification Popup -->
   <div id="notification-popup">File uploaded successfully!</div>
@@ -1361,7 +1668,7 @@
       conversation.push({ role: 'assistant', content: data.response });
       addBotMessageWithFormattingAndTyping(data.response, 1000);
     } else {
-      addMessage("Bloo: (No response)", 'bot');
+      addMessage("Whoops, I didn't get that. Can you ask me again please?", 'bot');
     }
   } catch (err) {
     console.error(err);
